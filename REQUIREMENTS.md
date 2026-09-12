@@ -267,7 +267,7 @@ Students should only see training information relevant to their assigned trainin
 
 Students shall be able to submit practical projects required as part of the program.
 
-The system should support:
+The whole system should support:
 
 - Project title
 - Project description
