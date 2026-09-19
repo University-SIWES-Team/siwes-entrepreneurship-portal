@@ -40,11 +40,19 @@ export default function SkillsShowcase() {
                 </p>
               </div>
 
-              <ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <ul
+                className={`mt-5 grid gap-4 ${
+                  group.skills.length === 1
+                    ? "sm:grid-cols-1"
+                    : "sm:grid-cols-2 lg:grid-cols-3"
+                }`}
+              >
                 {group.skills.map((skill) => (
                   <li
                     key={skill.name}
-                    className="rounded-lg border border-[#E2E8F0] bg-white p-5 shadow-sm transition-colors hover:border-[#1D5FA7]/40 sm:p-6"
+                    className={`rounded-lg border border-[#E2E8F0] bg-white p-5 shadow-sm transition-colors hover:border-[#1D5FA7]/40 sm:p-6 ${
+                      group.skills.length === 1 ? "max-w-md" : ""
+                    }`}
                   >
                     <span className="inline-flex rounded-md bg-[#0F2747]/[0.06] px-2.5 py-1 text-xs font-medium text-[#0F2747]">
                       {skill.label}
