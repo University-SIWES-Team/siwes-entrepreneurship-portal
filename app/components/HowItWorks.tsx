@@ -55,37 +55,43 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className="py-16 px-6">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl font-bold sm:text-4xl">
+    <section id="how-it-works" className="bg-white py-16 px-6 sm:py-20 lg:py-24">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-16 max-w-2xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#1D5FA7]">
+            The Process
+          </p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-[#0F2747] sm:text-4xl">
             How It Works
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-gray-600">
-            Follow these simple steps to complete your SIWES and
-            Entrepreneurship program journey.
+          <p className="mt-4 text-[#5B6474]">
+            Follow these ten steps to complete your SIWES and Entrepreneurship
+            programme journey, from registration through to your final results.
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {steps.map((step) => (
-            <div
-              key={step.number}
-              className="rounded-xl border p-6 shadow-sm"
-            >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-black text-sm font-bold text-white">
-                {step.number}
-              </div>
-
-              <h3 className="text-xl font-semibold">
-                {step.title}
-              </h3>
-
-              <p className="mt-2 text-gray-600">
-                {step.description}
-              </p>
-            </div>
-          ))}
+        <div className="relative">
+          <div
+            className="absolute left-5 top-0 bottom-0 w-px bg-[#E2E8F0]"
+            aria-hidden="true"
+          />
+          <ol className="space-y-10">
+            {steps.map((step) => (
+              <li key={step.number} className="group relative flex gap-6">
+                <div className="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0F2747] text-sm font-bold text-white ring-4 ring-white transition-colors group-hover:bg-[#1D5FA7]">
+                  {step.number}
+                </div>
+                <div className="flex-1 pt-1.5">
+                  <h3 className="text-lg font-semibold text-[#172033] transition-colors group-hover:text-[#1D5FA7]">
+                    {step.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-[#5B6474]">
+                    {step.description}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>
