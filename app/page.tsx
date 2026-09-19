@@ -1,7 +1,9 @@
+import SkillsShowcase from "./components/SkillsShowcase";
+
 export default function Home() {
   return (
-    <div>
-      {/* sections go here as they're merged in */}
-    </div>
+    <main className="flex-1 bg-white">
+      <SkillsShowcase />
+    </main>
   );
 }
