@@ -26,8 +26,9 @@ export default function About() {
           </p>
 
           <p className="leading-relaxed text-[#5B6474]">
-            The portal replaces manual, paper-based processes with a single
-            centralized system. It helps students and administrators manage:
+            The portal brings these programme processes into a single centralized
+            system, reducing reliance on manual processes. It helps students and
+            administrators manage
           </p>
 
           <ul className="list-inside list-disc space-y-2 text-[#5B6474]">
