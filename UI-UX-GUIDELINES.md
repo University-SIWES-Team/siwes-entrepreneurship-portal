@@ -269,8 +269,9 @@ Preferred characteristics:
 
 - White background
 - Subtle border
-- Small or moderate border radius
-- Minimal shadow
+- Moderate border radius (rounded-lg)
+- Soft shadow at rest (shadow-sm), deepening slightly on hover
+- Slight lift on hover (small upward shift)
 - Clear heading
 - Good internal spacing
 
@@ -393,26 +394,36 @@ Use one consistent icon style throughout the application.
 
 ## 15. Animation
 
-Animations should be subtle and purposeful.
+Animations should be subtle, purposeful, and add polish without becoming
+the focus of the page.
 
 Acceptable examples:
 
 - Small button hover transitions
 - Navigation hover states
-- Simple accordion transitions
-- Small card hover feedback
+- Simple accordion transitions (FAQ)
+- Small card hover feedback (slight lift, deeper shadow)
+- One-time scroll-reveal: a section fades and shifts up slightly the
+  first time it enters view, and never repeats
+- Staggered entrance for grouped items (e.g. skill cards, step cards)
+  appearing one after another, 50-100ms apart
+- Smooth (not instant) scrolling when a navigation link jumps to a
+  section on the same page
 
 Avoid:
 
-- Constant floating animations
-- Excessive scroll animations
+- Constant floating or looping animations
+- Parallax scrolling effects
 - Large entrance animations
 - Flashing elements
-- Animations that slow down interaction
+- Auto-playing animations that repeat every time a section is
+  scrolled past again
+- Animations that slow down interaction or block content from being
+  read immediately
 
-The portal should still look good when animations are disabled.
-
----
+The portal should still look good, and be fully usable, with
+animations disabled (e.g. a user with "reduce motion" enabled in
+their OS).
 
 ## 16. Responsive Design
 
