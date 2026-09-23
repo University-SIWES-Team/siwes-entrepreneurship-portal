@@ -12,16 +12,17 @@ export default function SkillsShowcase() {
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#1D5FA7]">
             Training areas
           </p>
+
           <h2
             id="skills-showcase-heading"
             className="mt-3 text-3xl font-semibold tracking-tight text-[#0F2747] sm:text-4xl"
           >
             Skills Showcase
           </h2>
+
           <p className="mt-4 text-base leading-7 text-[#5B6474] sm:text-lg">
-            Review the training areas currently identified for the programme.
-            The final institutional skill list is still being confirmed and may
-            change.
+            Explore the training areas currently available through the
+            programme.
           </p>
         </div>
 
@@ -35,6 +36,7 @@ export default function SkillsShowcase() {
                 >
                   {group.title}
                 </h3>
+
                 <p className="mt-2 text-sm leading-6 text-[#5B6474] sm:text-base">
                   {group.description}
                 </p>
@@ -54,12 +56,10 @@ export default function SkillsShowcase() {
                       group.skills.length === 1 ? "max-w-md" : ""
                     }`}
                   >
-                    <span className="inline-flex rounded-md bg-[#0F2747]/[0.06] px-2.5 py-1 text-xs font-medium text-[#0F2747]">
-                      {skill.label}
-                    </span>
-                    <h4 className="mt-4 text-lg font-semibold text-[#172033]">
+                    <h4 className="text-lg font-semibold text-[#172033]">
                       {skill.name}
                     </h4>
+
                     <p className="mt-2 text-sm leading-6 text-[#5B6474]">
                       {skill.description}
                     </p>

@@ -4,6 +4,7 @@ import About from "./components/About";
 import HowItWorks from "./components/HowItWorks";
 import FAQ from "./components/FAQ";
 import SkillsShowcase from "./components/SkillsShowcase";
+import Footer from "./components/Footer";
 
 export default function Home() {
   return (
@@ -17,6 +18,8 @@ export default function Home() {
         <HowItWorks />
         <FAQ />
       </main>
+      
+      <Footer />
     </>
   );
 }
