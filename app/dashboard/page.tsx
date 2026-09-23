@@ -98,22 +98,27 @@ export default function DashboardPage() {
               Dashboard
             </Link>
 
-            {[
-              "My Profile",
-              "Application",
-              "Payment",
-              "Training",
-              "Project",
-              "Examination",
-              "Results",
-            ].map((item) => (
-              <div
-                key={item}
-                className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]"
-              >
-                {item}
-              </div>
-            ))}
+            <div className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474]">
+              My Profile
+            </div>
+
+            <Link
+              href="/dashboard/application"
+              className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]"
+            >
+              Application
+            </Link>
+
+            {["Payment", "Training", "Project", "Examination", "Results"].map(
+              (item) => (
+                <div
+                  key={item}
+                  className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]"
+                >
+                  {item}
+                </div>
+              ),
+            )}
           </div>
         </nav>
 
@@ -135,6 +140,7 @@ export default function DashboardPage() {
             <p className="text-sm font-semibold text-[#0F2747]">
               OUI SIWES Portal
             </p>
+
             <p className="hidden text-xs text-[#7A8494] sm:block">
               Student Dashboard
             </p>
@@ -145,6 +151,7 @@ export default function DashboardPage() {
               <p className="text-sm font-semibold text-[#172033]">
                 Student Account
               </p>
+
               <p className="text-xs text-[#7A8494]">Programme participant</p>
             </div>
 
@@ -178,6 +185,7 @@ export default function DashboardPage() {
                 <p className="text-xs font-medium uppercase tracking-[0.12em] text-[#7A8494]">
                   Current stage
                 </p>
+
                 <p className="mt-1 text-sm font-semibold text-[#172033]">
                   Programme Application
                 </p>
@@ -275,13 +283,12 @@ export default function DashboardPage() {
               </p>
 
               <div className="mt-6">
-                <button
-                  type="button"
-                  disabled
-                  className="w-full rounded-lg bg-white px-4 py-3 text-sm font-semibold text-[#0F2747] opacity-70"
+                <Link
+                  href="/dashboard/application"
+                  className="block w-full rounded-lg bg-white px-4 py-3 text-center text-sm font-semibold text-[#0F2747] transition hover:-translate-y-0.5 hover:bg-[#F7F9FC]"
                 >
-                  Application Module Coming Next
-                </button>
+                  Start Application
+                </Link>
               </div>
             </aside>
           </section>
