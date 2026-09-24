@@ -18,7 +18,7 @@ export const skillsShowcaseGroups: ShowcaseSkillGroup[] = [
       "Explore the practical, technical, creative, and digital training opportunities currently available through the programme.",
     skills: [
       {
-        name: "Barnbing",
+        name: "Barbing",
         description:
           "Practical training in professional barbering techniques and services.",
       },
