@@ -58,7 +58,7 @@ export async function getApplicationData() {
     },
     include: {
       skill: true,
-      payment: true,
+      payments: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -121,6 +121,25 @@ export async function submitApplication(
       studentId: student.id,
       skillId: skill.id,
       status: "PENDING",
+      payments: {
+        create: [
+          {
+            type: "SIWES_REGISTRATION",
+            amount: 30000,
+            status: "PENDING",
+          },
+          {
+            type: "VOCATIONAL_TRAINING",
+            amount: 20000,
+            status: "PENDING",
+          },
+          {
+            type: "EXAMINATION",
+            amount: 17000,
+            status: "PENDING",
+          },
+        ],
+      },
     },
   });
 

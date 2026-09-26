@@ -65,19 +65,28 @@ model Application {
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
 
-  payment            Payment?
+  payments           Payment[]
   trainingAssignment TrainingAssignment?
+}
+
+enum PaymentType {
+  SIWES_REGISTRATION
+  VOCATIONAL_TRAINING
+  EXAMINATION
 }
 
 model Payment {
   id            String        @id @default(cuid())
-  applicationId String        @unique
+  applicationId String
   application   Application   @relation(fields: [applicationId], references: [id])
+  type          PaymentType
   amount        Decimal       @db.Decimal(10, 2)
   status        PaymentStatus @default(PENDING)
   providerRef   String?       @unique
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+
+  @@unique([applicationId, type])
 }
 
 model Trainer {
