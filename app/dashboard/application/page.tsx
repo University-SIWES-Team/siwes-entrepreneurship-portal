@@ -1,5 +1,6 @@
 import { getApplicationData } from "@/app/actions/application";
 import ApplicationForm from "../../components/ApplicationForm";
+import PaymentEvidenceForm from "./PaymentEvidenceForm";
 
 const paymentLabels = {
   SIWES_REGISTRATION: "SIWES Registration",
@@ -15,6 +16,41 @@ const paymentAmounts = {
 
 function formatAmount(amount: number) {
   return `₦${amount.toLocaleString("en-NG")}`;
+}
+
+function getPaymentStatusLabel(status: string) {
+  switch (status) {
+    case "PENDING":
+      return "Pending";
+
+    case "PENDING_REVIEW":
+      return "Pending Review";
+
+    case "PAID":
+      return "Paid";
+
+    case "FAILED":
+      return "Payment Rejected";
+
+    default:
+      return status;
+  }
+}
+
+function getPaymentStatusClass(status: string) {
+  switch (status) {
+    case "PAID":
+      return "bg-green-100 text-green-700";
+
+    case "PENDING_REVIEW":
+      return "bg-amber-100 text-amber-700";
+
+    case "FAILED":
+      return "bg-red-100 text-red-700";
+
+    default:
+      return "bg-slate-100 text-slate-700";
+  }
 }
 
 export default async function ApplicationPage() {
@@ -56,6 +92,7 @@ export default async function ApplicationPage() {
 
         {application ? (
           <div className="mt-8 space-y-6">
+            {/* Application summary */}
             <section className="rounded-lg border border-[#E2E8F0] bg-white p-6 shadow-sm">
               <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#1D5FA7]">
                 Application submitted
@@ -82,15 +119,18 @@ export default async function ApplicationPage() {
                   </p>
 
                   <p className="mt-1 font-medium text-[#172033]">
-                    {application.payments.filter(
-                      (payment) => payment.status === "PAID",
-                    ).length}
+                    {
+                      application.payments.filter(
+                        (payment) => payment.status === "PAID",
+                      ).length
+                    }
                     /{application.payments.length} payments paid
                   </p>
                 </div>
               </div>
             </section>
 
+            {/* Payment section */}
             <section className="rounded-lg border border-[#E2E8F0] bg-white p-6 shadow-sm">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#1D5FA7]">
@@ -103,50 +143,112 @@ export default async function ApplicationPage() {
 
                 <p className="mt-2 text-sm leading-6 text-[#5B6474]">
                   Your programme fees are divided into three separate
-                  payments.
+                  payments. Upload your payment evidence for each payment
+                  after making the payment.
                 </p>
               </div>
 
-              <div className="mt-6 space-y-4">
-                {application.payments.map((payment) => (
-                  <div
-                    key={payment.id}
-                    className="flex flex-col gap-4 rounded-lg border border-[#E2E8F0] p-5 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div>
-                      <h3 className="font-semibold text-[#172033]">
-                        {paymentLabels[payment.type]}
-                      </h3>
+              <div className="mt-6 space-y-5">
+                {application.payments.map((payment) => {
+                  const paymentName =
+                    paymentLabels[payment.type];
 
-                      <p className="mt-1 text-lg font-semibold text-[#0F2747]">
-                        {formatAmount(paymentAmounts[payment.type])}
-                      </p>
-                    </div>
+                  return (
+                    <div
+                      key={payment.id}
+                      className="rounded-lg border border-[#E2E8F0] p-5"
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <h3 className="font-semibold text-[#172033]">
+                            {paymentName}
+                          </h3>
 
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                          payment.status === "PAID"
-                            ? "bg-green-100 text-green-700"
-                            : payment.status === "FAILED"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-yellow-100 text-yellow-700"
-                        }`}
-                      >
-                        {payment.status}
-                      </span>
+                          <p className="mt-1 text-lg font-semibold text-[#0F2747]">
+                            {formatAmount(paymentAmounts[payment.type])}
+                          </p>
+                        </div>
 
-                      {payment.status !== "PAID" && (
-                        <button
-                          type="button"
-                          className="rounded-lg bg-[#1D5FA7] px-4 py-2 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#174F8C]"
+                        <span
+                          className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${getPaymentStatusClass(
+                            payment.status,
+                          )}`}
                         >
-                          Pay Now
-                        </button>
+                          {getPaymentStatusLabel(payment.status)}
+                        </span>
+                      </div>
+
+                      {/* Payment awaiting review */}
+                      {payment.status === "PENDING_REVIEW" && (
+                        <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                          <p className="font-medium text-amber-800">
+                            Payment evidence submitted
+                          </p>
+
+                          <p className="mt-1 text-sm leading-6 text-amber-700">
+                            Your payment receipt has been submitted and is
+                            waiting for administrator verification.
+                          </p>
+
+                          {payment.manualReference && (
+                            <p className="mt-2 text-sm text-amber-700">
+                              Reference:{" "}
+                              <span className="font-medium">
+                                {payment.manualReference}
+                              </span>
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Confirmed payment */}
+                      {payment.status === "PAID" && (
+                        <div className="mt-5 rounded-lg border border-green-200 bg-green-50 p-4">
+                          <p className="font-medium text-green-800">
+                            Payment confirmed
+                          </p>
+
+                          <p className="mt-1 text-sm leading-6 text-green-700">
+                            Your payment has been verified by the programme
+                            administrator.
+                          </p>
+
+                          {payment.manualReference && (
+                            <p className="mt-2 text-sm text-green-700">
+                              Reference:{" "}
+                              <span className="font-medium">
+                                {payment.manualReference}
+                              </span>
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Rejected payment */}
+                      {payment.status === "FAILED" && (
+                        <div className="mt-5 rounded-lg border border-red-200 bg-red-50 p-4">
+                          <p className="font-medium text-red-800">
+                            Payment evidence rejected
+                          </p>
+
+                          <p className="mt-1 text-sm leading-6 text-red-700">
+                            Your previous payment evidence was rejected.
+                            Please submit the correct payment evidence again.
+                          </p>
+                        </div>
+                      )}
+
+                      {/* New payment / resubmission */}
+                      {(payment.status === "PENDING" ||
+                        payment.status === "FAILED") && (
+                        <PaymentEvidenceForm
+                          paymentId={payment.id}
+                          paymentName={paymentName}
+                        />
                       )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="mt-6 flex items-center justify-between border-t border-[#E2E8F0] pt-5">
@@ -159,9 +261,49 @@ export default async function ApplicationPage() {
                 </span>
               </div>
             </section>
+
+            {/* Student information */}
+            <section className="rounded-lg border border-[#E2E8F0] bg-white p-6 shadow-sm">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#1D5FA7]">
+                Student
+              </p>
+
+              <h2 className="mt-2 text-xl font-semibold text-[#172033]">
+                Your Information
+              </h2>
+
+              <div className="mt-5 grid gap-5 sm:grid-cols-3">
+                <div>
+                  <p className="text-sm text-[#7A8494]">Full name</p>
+
+                  <p className="mt-1 font-medium text-[#172033]">
+                    {student.fullName}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-[#7A8494]">
+                    Matric number
+                  </p>
+
+                  <p className="mt-1 font-medium text-[#172033]">
+                    {student.matricNumber}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-[#7A8494]">Level</p>
+
+                  <p className="mt-1 font-medium text-[#172033]">
+                    {student.level}
+                  </p>
+                </div>
+              </div>
+            </section>
           </div>
         ) : (
           <div className="mt-8 space-y-6">
+            {/* Student information before application */}
             <section className="rounded-lg border border-[#E2E8F0] bg-white p-6 shadow-sm">
               <h2 className="text-lg font-semibold text-[#172033]">
                 Student information
@@ -177,7 +319,9 @@ export default async function ApplicationPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm text-[#7A8494]">Matric number</p>
+                  <p className="text-sm text-[#7A8494]">
+                    Matric number
+                  </p>
 
                   <p className="mt-1 font-medium text-[#172033]">
                     {student.matricNumber}
