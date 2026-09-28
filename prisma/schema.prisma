@@ -44,8 +44,14 @@ enum ApplicationStatus {
 
 enum PaymentStatus {
   PENDING
+  PENDING_REVIEW
   PAID
   FAILED
+}
+
+enum PaymentMethod {
+  MANUAL
+  ONLINE
 }
 
 model Skill {
@@ -76,15 +82,24 @@ enum PaymentType {
 }
 
 model Payment {
-  id            String        @id @default(cuid())
-  applicationId String
-  application   Application   @relation(fields: [applicationId], references: [id])
-  type          PaymentType
-  amount        Decimal       @db.Decimal(10, 2)
-  status        PaymentStatus @default(PENDING)
-  providerRef   String?       @unique
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id                String        @id @default(cuid())
+  applicationId     String
+  amount            Decimal       @db.Decimal(10, 2)
+  status            PaymentStatus @default(PENDING)
+  method            PaymentMethod @default(MANUAL)
+  providerRef       String?       @unique
+  manualReference   String?
+  paymentDate      DateTime?
+  evidencePath      String?
+  evidenceName      String?
+  evidenceMimeType  String?
+  evidenceSize      Int?
+  submittedAt       DateTime?
+  reviewedAt        DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  type              PaymentType
+  application       Application   @relation(fields: [applicationId], references: [id])
 
   @@unique([applicationId, type])
 }
