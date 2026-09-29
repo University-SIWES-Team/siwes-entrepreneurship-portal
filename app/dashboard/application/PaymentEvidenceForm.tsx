@@ -1,7 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState, type FormEvent } from "react";
 import { submitPaymentEvidence } from "@/app/actions/payment";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 type PaymentEvidenceFormProps = {
   paymentId: string;
@@ -16,6 +18,7 @@ export default function PaymentEvidenceForm({
     submitPaymentEvidence,
     {},
   );
+  const [fileError, setFileError] = useState("");
 
   if (state.success) {
     return (
@@ -30,8 +33,28 @@ export default function PaymentEvidenceForm({
     );
   }
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    const form = event.currentTarget;
+    const fileInput = form.elements.namedItem(
+      "evidence",
+    ) as HTMLInputElement;
+    const file = fileInput.files?.[0];
+
+    if (file && file.size > MAX_FILE_SIZE) {
+      event.preventDefault();
+      setFileError("File size must be 5MB or less.");
+      return;
+    }
+
+    setFileError("");
+  };
+
   return (
-    <form action={formAction} className="mt-4 space-y-4">
+    <form
+      action={formAction}
+      onSubmit={handleSubmit}
+      className="mt-4 space-y-4"
+    >
       <input type="hidden" name="paymentId" value={paymentId} />
 
       <div>
@@ -91,9 +114,9 @@ export default function PaymentEvidenceForm({
         </p>
       </div>
 
-      {state.error && (
+      {(fileError || state.error) && (
         <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-          {state.error}
+          {fileError || state.error}
         </p>
       )}
 
@@ -107,3 +130,4 @@ export default function PaymentEvidenceForm({
     </form>
   );
 }
+
