@@ -87,7 +87,7 @@ export async function rejectPayment(
     },
   });
 
-  if (!payment) {
+  if (!payment || payment.status === "PAID") {
     return;
   }
 

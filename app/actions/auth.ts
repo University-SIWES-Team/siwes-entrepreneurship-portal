@@ -17,6 +17,14 @@ export async function registerStudent(formData: FormData) {
     return { error: "An account with this email already exists." };
   }
 
+  const existingStudent = await prisma.student.findUnique({
+  where: { matricNumber },
+});
+
+if (existingStudent) {
+  return { error: "A student with this matric number already exists." };
+}
+
   const passwordHash = await hashPassword(password);
 
   const user = await prisma.user.create({

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { logout } from "@/app/actions/auth";
+import { getApplicationData } from "@/app/actions/application";
 
 const journey = [
   {
@@ -52,25 +53,41 @@ const journey = [
   },
 ];
 
-const overviewItems = [
-  {
-    label: "Application",
-    value: "Not started",
-    description: "Programme application",
-  },
-  {
-    label: "Payment",
-    value: "Not available",
-    description: "Payment verification",
-  },
-  {
-    label: "Skill",
-    value: "Not selected",
-    description: "Training skill",
-  },
-];
+export default async function DashboardPage() {
+  const data = await getApplicationData();
 
-export default function DashboardPage() {
+  if ("error" in data) {
+    return null;
+  }
+
+  const { application } = data;
+
+  const paymentsPaid =
+    application?.payments.filter((payment) => payment.status === "PAID")
+      .length ?? 0;
+
+  const totalPayments = application?.payments.length ?? 0;
+
+  const overviewItems = [
+    {
+      label: "Application",
+      value: application ? application.status : "Not started",
+      description: "Programme application",
+    },
+    {
+      label: "Payment",
+      value: application
+        ? `${paymentsPaid}/${totalPayments} paid`
+        : "Not available",
+      description: "Payment verification",
+    },
+    {
+      label: "Skill",
+      value: application?.skill.name ?? "Not selected",
+      description: "Training skill",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-[#F7F9FC] text-[#172033]">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-[#E2E8F0] bg-white lg:flex lg:flex-col">
@@ -81,7 +98,6 @@ export default function DashboardPage() {
           >
             OUI SIWES Portal
           </Link>
-
           <p className="mt-1 text-xs text-[#7A8494]">Student Portal</p>
         </div>
 
@@ -140,7 +156,6 @@ export default function DashboardPage() {
             <p className="text-sm font-semibold text-[#0F2747]">
               OUI SIWES Portal
             </p>
-
             <p className="hidden text-xs text-[#7A8494] sm:block">
               Student Dashboard
             </p>
@@ -151,8 +166,9 @@ export default function DashboardPage() {
               <p className="text-sm font-semibold text-[#172033]">
                 Student Account
               </p>
-
-              <p className="text-xs text-[#7A8494]">Programme participant</p>
+              <p className="text-xs text-[#7A8494]">
+                Programme participant
+              </p>
             </div>
 
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0F2747] text-sm font-semibold text-white">
@@ -160,6 +176,23 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Mobile navigation */}
+        <nav className="flex gap-1 overflow-x-auto border-t border-[#E2E8F0] px-4 py-2 lg:hidden">
+          <Link
+            href="/dashboard"
+            className="shrink-0 rounded-lg bg-[#F0F5FA] px-3 py-2 text-sm font-semibold text-[#1D5FA7]"
+          >
+            Dashboard
+          </Link>
+
+          <Link
+            href="/dashboard/application"
+            className="shrink-0 rounded-lg px-3 py-2 text-sm text-[#5B6474]"
+          >
+            Application
+          </Link>
+        </nav>
       </header>
 
       <main className="lg:ml-64">
@@ -187,7 +220,11 @@ export default function DashboardPage() {
                 </p>
 
                 <p className="mt-1 text-sm font-semibold text-[#172033]">
-                  Programme Application
+                  {!application
+                    ? "Programme Application"
+                    : paymentsPaid < totalPayments
+                      ? "Payment"
+                      : "Training"}
                 </p>
               </div>
             </div>
@@ -274,22 +311,31 @@ export default function DashboardPage() {
               </p>
 
               <h2 className="mt-3 text-xl font-bold">
-                Complete your programme application
+                {!application
+                  ? "Complete your programme application"
+                  : paymentsPaid < totalPayments
+                    ? "Complete your programme payments"
+                    : "Programme application complete"}
               </h2>
 
               <p className="mt-3 text-sm leading-6 text-white/70">
-                Your next stage is to submit the information required for your
-                programme application.
+                {!application
+                  ? "Your next stage is to submit the information required for your programme application."
+                  : paymentsPaid < totalPayments
+                    ? "Complete your outstanding programme payments and submit your payment evidence."
+                    : "Your application and programme payments are complete."}
               </p>
 
-              <div className="mt-6">
-                <Link
-                  href="/dashboard/application"
-                  className="block w-full rounded-lg bg-white px-4 py-3 text-center text-sm font-semibold text-[#0F2747] transition hover:-translate-y-0.5 hover:bg-[#F7F9FC]"
-                >
-                  Start Application
-                </Link>
-              </div>
+              {!application && (
+                <div className="mt-6">
+                  <Link
+                    href="/dashboard/application"
+                    className="block w-full rounded-lg bg-white px-4 py-3 text-center text-sm font-semibold text-[#0F2747] transition hover:-translate-y-0.5 hover:bg-[#F7F9FC]"
+                  >
+                    Start Application
+                  </Link>
+                </div>
+              )}
             </aside>
           </section>
 
