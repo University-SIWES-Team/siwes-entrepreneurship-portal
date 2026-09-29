@@ -24,9 +24,7 @@ async function getAdmin() {
       },
     });
 
-    if (!user || user.role !== "ADMIN") {
-      return null;
-    }
+    if (!user || user.role !== "ADMIN") return null;
 
     return user;
   } catch {
@@ -34,10 +32,15 @@ async function getAdmin() {
   }
 }
 
+export type TrainingActionState = {
+  error?: string;
+  success?: boolean;
+};
+
 export async function assignTrainer(
   applicationId: string,
   trainerId: string,
-) {
+): Promise<TrainingActionState> {
   const admin = await getAdmin();
 
   if (!admin) {
@@ -85,8 +88,59 @@ export async function assignTrainer(
     },
   });
 
+  revalidatePath("/dashboard/admin");
   revalidatePath("/dashboard/admin/applications");
   revalidatePath(`/dashboard/admin/applications/${applicationId}`);
+  revalidatePath("/dashboard/admin/trainers");
+  revalidatePath("/dashboard/application");
+  revalidatePath("/dashboard");
+
+  return { success: true };
+}
+
+export async function updateTrainingStatus(
+  assignmentId: string,
+  status: "ASSIGNED" | "ACTIVE" | "COMPLETED",
+): Promise<TrainingActionState> {
+  const admin = await getAdmin();
+
+  if (!admin) {
+    return { error: "Unauthorized." };
+  }
+
+  const assignment = await prisma.trainingAssignment.findUnique({
+    where: {
+      id: assignmentId,
+    },
+  });
+
+  if (!assignment) {
+    return { error: "Training assignment not found." };
+  }
+
+  await prisma.trainingAssignment.update({
+    where: {
+      id: assignmentId,
+    },
+    data: {
+      status,
+      startedAt:
+        status === "ACTIVE" && !assignment.startedAt
+          ? new Date()
+          : assignment.startedAt,
+      completedAt:
+        status === "COMPLETED"
+          ? new Date()
+          : status === "ACTIVE"
+            ? null
+            : assignment.completedAt,
+    },
+  });
+
+  revalidatePath("/dashboard/admin");
+  revalidatePath("/dashboard/admin/trainers");
+  revalidatePath("/dashboard/admin/applications");
+  revalidatePath("/dashboard/application");
   revalidatePath("/dashboard");
 
   return { success: true };

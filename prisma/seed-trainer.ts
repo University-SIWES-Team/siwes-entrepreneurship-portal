@@ -1,10 +1,9 @@
+import "dotenv/config";
 import { prisma } from "../app/lib/prisma";
 
 async function main() {
   const trainer = await prisma.trainer.upsert({
-    where: {
-      email: "trainer@ouisiwes.local",
-    },
+    where: { email: "trainer@ouisiwes.local" },
     update: {},
     create: {
       fullName: "OUI Training Coordinator",
