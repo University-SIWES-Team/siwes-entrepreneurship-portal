@@ -176,6 +176,23 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Mobile navigation */}
+        <nav className="flex gap-1 overflow-x-auto border-t border-[#E2E8F0] px-4 py-2 lg:hidden">
+          <Link
+            href="/dashboard"
+            className="shrink-0 rounded-lg bg-[#F0F5FA] px-3 py-2 text-sm font-semibold text-[#1D5FA7]"
+          >
+            Dashboard
+          </Link>
+
+          <Link
+            href="/dashboard/application"
+            className="shrink-0 rounded-lg px-3 py-2 text-sm text-[#5B6474]"
+          >
+            Application
+          </Link>
+        </nav>
       </header>
 
       <main className="lg:ml-64">
