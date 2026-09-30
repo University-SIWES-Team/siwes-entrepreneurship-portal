@@ -1,6 +1,7 @@
 import { getApplicationData } from "@/app/actions/application";
 import ApplicationForm from "../../components/ApplicationForm";
 import PaymentEvidenceForm from "./PaymentEvidenceForm";
+import PaystackPaymentButton from "./PaystackPaymentButton";
 
 const paymentLabels = {
   SIWES_REGISTRATION: "SIWES Registration",
@@ -238,13 +239,27 @@ export default async function ApplicationPage() {
                         </div>
                       )}
 
-                      {/* New payment / resubmission */}
                       {(payment.status === "PENDING" ||
                         payment.status === "FAILED") && (
-                        <PaymentEvidenceForm
-                          paymentId={payment.id}
-                          paymentName={paymentName}
-                        />
+                        <>
+                          <PaystackPaymentButton
+                            paymentId={payment.id}
+                            amount={formatAmount(paymentAmounts[payment.type])}
+                          />
+
+                          <div className="my-4 flex items-center gap-3">
+                            <div className="h-px flex-1 bg-[#E2E8F0]" />
+                            <span className="text-xs font-medium uppercase tracking-[0.12em] text-[#7A8494]">
+                              Or pay manually
+                            </span>
+                            <div className="h-px flex-1 bg-[#E2E8F0]" />
+                          </div>
+
+                          <PaymentEvidenceForm
+                            paymentId={payment.id}
+                            paymentName={paymentName}
+                          />
+                        </>
                       )}
                     </div>
                   );

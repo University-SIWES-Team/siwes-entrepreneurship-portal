@@ -2,8 +2,10 @@
 
 import { prisma } from "@/app/lib/prisma";
 import { supabaseAdmin } from "@/app/lib/supabase-admin";
+import { initializePaystackTransaction } from "@/app/lib/paystack";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
+import { redirect } from "next/navigation";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -153,4 +155,102 @@ export async function submitPaymentEvidence(
   return {
     success: true,
   };
+}
+
+const PAYMENT_AMOUNTS = {
+  SIWES_REGISTRATION: 30000,
+  VOCATIONAL_TRAINING: 20000,
+  EXAMINATION: 17000,
+} as const;
+
+export async function initializePaystackPayment(
+  _previousState: PaymentActionState,
+  formData: FormData,
+): Promise<PaymentActionState> {
+  const student = await getStudentFromSession();
+
+  if (!student) {
+    return { error: "Unauthorized." };
+  }
+
+  const paymentId = formData.get("paymentId");
+
+  if (typeof paymentId !== "string" || !paymentId) {
+    return { error: "Invalid payment." };
+  }
+
+  const payment = await prisma.payment.findUnique({
+    where: {
+      id: paymentId,
+    },
+    include: {
+      application: {
+        include: {
+          student: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!payment) {
+    return { error: "Payment not found." };
+  }
+
+  if (payment.application.studentId !== student.id) {
+    return { error: "You are not authorized to pay this payment." };
+  }
+
+  if (payment.status === "PAID") {
+    return { error: "This payment has already been confirmed." };
+  }
+
+  const expectedAmount = PAYMENT_AMOUNTS[payment.type];
+
+  if (Number(payment.amount) !== expectedAmount) {
+    return { error: "Payment amount could not be verified." };
+  }
+
+  const reference = `OUI-${payment.id}-${Date.now()}`;
+
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+  let transaction;
+
+try {
+  transaction = await initializePaystackTransaction({
+    email: payment.application.student.user.email,
+    amount: expectedAmount * 100,
+    reference,
+    callbackUrl: `${appUrl}/api/paystack/callback`,
+    metadata: {
+      paymentId: payment.id,
+      applicationId: payment.applicationId,
+      paymentType: payment.type,
+      studentId: payment.application.studentId,
+    },
+  });
+} catch (error) {
+  console.error("Paystack initialization failed:", error);
+
+  return {
+    error: "Could not start the Paystack payment. Please try again.",
+  };
+}
+
+await prisma.payment.update({
+  where: {
+    id: payment.id,
+  },
+  data: {
+    method: "ONLINE",
+    providerRef: transaction.reference,
+  },
+});
+
+redirect(transaction.authorization_url);
 }
