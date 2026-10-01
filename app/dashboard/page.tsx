@@ -97,7 +97,7 @@ export default async function DashboardPage() {
             href="/"
             className="text-lg font-bold tracking-tight text-[#0F2747]"
           >
-            OUI SIWES Portal
+            Entrepreneurship Portal
           </Link>
           <p className="mt-1 text-xs text-[#7A8494]">Student Portal</p>
         </div>
@@ -126,7 +126,14 @@ export default async function DashboardPage() {
               Application
             </Link>
 
-            {["Payment", "Training", "Project", "Examination", "Results"].map(
+            <Link
+              href="/dashboard/payments"
+              className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]"
+            >
+              Payments
+            </Link>
+
+            {["Training", "Project", "Examination", "Results"].map(
               (item) => (
                 <div
                   key={item}
@@ -155,7 +162,7 @@ export default async function DashboardPage() {
         <div className="flex h-16 items-center justify-between px-5 sm:px-8">
           <div>
             <p className="text-sm font-semibold text-[#0F2747]">
-              OUI SIWES Portal
+              Entrepreneurship Portal
             </p>
             <p className="hidden text-xs text-[#7A8494] sm:block">
               Student Dashboard
@@ -193,6 +200,13 @@ export default async function DashboardPage() {
           >
             Application
           </Link>
+
+          <Link
+            href="/dashboard/payments"
+            className="shrink-0 rounded-lg px-3 py-2 text-sm text-[#5B6474]"
+          >
+            Payments
+          </Link>
         </nav>
       </header>
 
@@ -210,7 +224,7 @@ export default async function DashboardPage() {
                 </h1>
 
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-[#5B6474] sm:text-base">
-                  Manage your SIWES and Entrepreneurship Programme journey from
+                  Manage your Entrepreneurship Programme journey from
                   registration through completion.
                 </p>
               </div>
@@ -327,13 +341,22 @@ export default async function DashboardPage() {
                     : "Your application and programme payments are complete."}
               </p>
 
-              {!application && (
+              {!application ? (
                 <div className="mt-6">
                   <Link
                     href="/dashboard/application"
                     className="block w-full rounded-lg bg-white px-4 py-3 text-center text-sm font-semibold text-[#0F2747] transition hover:-translate-y-0.5 hover:bg-[#F7F9FC]"
                   >
                     Start Application
+                  </Link>
+                </div>
+              ) : (
+                <div className="mt-6">
+                  <Link
+                    href="/dashboard/payments"
+                    className="block w-full rounded-lg bg-[#1D5FA7] px-4 py-3 text-center text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#154b85]"
+                  >
+                    Make Payments
                   </Link>
                 </div>
               )}
@@ -355,7 +378,7 @@ export default async function DashboardPage() {
               </div>
 
               <span className="text-xs font-medium uppercase tracking-[0.12em] text-[#7A8494]">
-                OUI SIWES Portal
+                Entrepreneurship Programme
               </span>
             </div>
           </section>
