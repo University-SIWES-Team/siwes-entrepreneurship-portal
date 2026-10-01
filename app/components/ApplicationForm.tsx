@@ -5,6 +5,7 @@ import {
   submitApplication,
   type ApplicationState,
 } from "@/app/actions/application";
+import LoadingButton from "@/app/components/LoadingButton";
 
 type Skill = {
   id: string;
@@ -70,13 +71,13 @@ export default function ApplicationForm({
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={isPending}
-          className="mt-6 rounded-lg bg-[#1D5FA7] px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#174F8C] disabled:cursor-not-allowed disabled:opacity-60"
+        <LoadingButton
+          loading={isPending}
+          loadingText="Submitting..."
+          className="w-full"
         >
-          {isPending ? "Submitting..." : "Submit Application"}
-        </button>
+          Submit Application
+        </LoadingButton>
       </form>
     </section>
   );

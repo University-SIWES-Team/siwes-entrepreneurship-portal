@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { logout } from "@/app/actions/auth";
 import { getApplicationData } from "@/app/actions/application";
+import LoadingButton from "@/app/components/LoadingButton";
 
 const journey = [
   {
@@ -140,12 +141,12 @@ export default async function DashboardPage() {
 
         <div className="border-t border-[#E2E8F0] p-4">
           <form action={logout}>
-            <button
-              type="submit"
-              className="w-full rounded-lg border border-[#E2E8F0] px-3 py-2.5 text-sm font-medium text-[#5B6474] transition duration-200 hover:border-[#1D5FA7]/30 hover:bg-[#F7F9FC] hover:text-[#0F2747]"
+            <LoadingButton
+              loadingText="Signing out..."
+              className="w-full"
             >
-              Log out
-            </button>
+              Sign out
+            </LoadingButton>
           </form>
         </div>
       </aside>
@@ -363,12 +364,12 @@ export default async function DashboardPage() {
 
       <div className="border-t border-[#E2E8F0] bg-white p-4 lg:hidden">
         <form action={logout}>
-          <button
-            type="submit"
-            className="w-full rounded-lg border border-[#E2E8F0] px-4 py-3 text-sm font-semibold text-[#5B6474] transition hover:bg-[#F7F9FC]"
+          <LoadingButton
+            loadingText="Signing out..."
+            className="w-full"
           >
-            Log out
-          </button>
+            Sign out
+          </LoadingButton>
         </form>
       </div>
     </div>

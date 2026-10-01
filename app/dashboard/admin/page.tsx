@@ -2,6 +2,8 @@ import { prisma } from "@/app/lib/prisma";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { redirect } from "next/navigation";
+import { logout } from "@/app/actions/auth";
+import LoadingButton from "@/app/components/LoadingButton";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -78,18 +80,26 @@ export default async function AdminDashboardPage() {
   return (
     <main className="min-h-screen bg-[#F7F9FC] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#1D5FA7]">
-            Administration
-          </p>
+        <div className="flex flex-col gap-6 border-b border-[#E2E8F0] pb-8 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#1D5FA7]">
+              Administration
+            </p>
 
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#0F2747] sm:text-4xl">
-            Admin Dashboard
-          </h1>
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#0F2747] sm:text-4xl">
+              Admin Dashboard
+            </h1>
 
-          <p className="mt-3 max-w-2xl text-base leading-7 text-[#5B6474]">
-            Manage students, applications, payments and programme activities.
-          </p>
+            <p className="mt-3 max-w-2xl text-base leading-7 text-[#5B6474]">
+              Manage students, applications, payments and programme activities.
+            </p>
+          </div>
+
+          <form action={logout} className="shrink-0">
+            <LoadingButton loadingText="Signing out...">
+              Sign out
+            </LoadingButton>
+          </form>
         </div>
 
         <section className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -134,21 +144,25 @@ export default async function AdminDashboardPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[760px] text-left">
+            <table className="min-w-190 text-left">
               <thead className="border-b border-[#E2E8F0] bg-[#F7F9FC]">
                 <tr>
                   <th className="px-6 py-4 text-sm font-semibold text-[#172033]">
                     Student
                   </th>
+
                   <th className="px-6 py-4 text-sm font-semibold text-[#172033]">
                     Skill
                   </th>
+
                   <th className="px-6 py-4 text-sm font-semibold text-[#172033]">
                     Application
                   </th>
+
                   <th className="px-6 py-4 text-sm font-semibold text-[#172033]">
                     Payment
                   </th>
+
                   <th className="px-6 py-4 text-sm font-semibold text-[#172033]">
                     Action
                   </th>

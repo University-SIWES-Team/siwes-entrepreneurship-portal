@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { registerStudent } from "@/app/actions/auth";
+import LoadingButton from "@/app/components/LoadingButton";
 
 export default function RegisterForm() {
   const [error, setError] = useState<string | null>(null);
@@ -242,13 +243,13 @@ export default function RegisterForm() {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-lg bg-[#1D5FA7] px-4 py-3.5 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-[#174F8B] hover:shadow-md disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
+              <LoadingButton
+                loading={loading}
+                loadingText="Creating account..."
+                className="w-full"
               >
-                {loading ? "Creating account..." : "Create Student Account"}
-              </button>
+                Create Student Account
+              </LoadingButton>
             </form>
 
             <div className="mt-6 border-t border-[#E2E8F0] pt-6 text-center">
