@@ -3,25 +3,36 @@
 import { useState } from "react";
 import Link from "next/link";
 import { loginStudent } from "@/app/actions/auth";
+import LoadingButton from "@/app/components/LoadingButton";
 
 export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(formData: FormData) {
-    setLoading(true);
-    setError(null);
+  setLoading(true);
+  setError(null);
 
-    const result = await loginStudent(formData);
+  const result = await loginStudent(formData);
 
-    if (result?.error) {
-      setError(result.error);
-      setLoading(false);
-      return;
-    }
-
-    window.location.href = "/dashboard";
+  if (result?.error) {
+    setError(result.error);
+    setLoading(false);
+    return;
   }
+
+  if (result?.role === "ADMIN") {
+    window.location.href = "/dashboard/admin";
+    return;
+  }
+
+  if (result?.role === "TRAINER") {
+    window.location.href = "/dashboard/trainer";
+    return;
+  }
+
+  window.location.href = "/dashboard";
+}
 
   return (
     <main className="min-h-screen bg-[#F7F9FC] lg:grid lg:grid-cols-[1.1fr_0.9fr]">
@@ -152,13 +163,13 @@ export default function LoginForm() {
                 />
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="mt-2 w-full rounded-lg bg-[#1D5FA7] px-4 py-3.5 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-[#174F8B] hover:shadow-md disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
+              <LoadingButton
+                loading={loading}
+                loadingText="Signing in..."
+                className="mt-2 w-full"
               >
-                {loading ? "Logging in..." : "Log In"}
-              </button>
+                Log In
+              </LoadingButton>
             </form>
 
             <div className="mt-6 border-t border-[#E2E8F0] pt-6 text-center">

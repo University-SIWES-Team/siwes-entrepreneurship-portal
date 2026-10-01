@@ -77,7 +77,10 @@ export async function loginStudent(formData: FormData) {
     path: "/",
   });
 
-  return { success: true };
+    return {
+      success: true,
+      role: user.role,
+    };
 }
 
 export async function logout() {
