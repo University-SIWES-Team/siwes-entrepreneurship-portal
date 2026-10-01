@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   if (!reference) {
     return NextResponse.redirect(
       new URL(
-        "/dashboard/application?payment=missing-reference",
+        "/dashboard/payments?payment=missing-reference",
         request.url,
       ),
     );
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
   if (!payment) {
     return NextResponse.redirect(
       new URL(
-        "/dashboard/application?payment=not-found",
+        "/dashboard/payments?payment=not-found",
         request.url,
       ),
     );
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
   if (payment.status === "PAID") {
     return NextResponse.redirect(
       new URL(
-        "/dashboard/application?payment=already-paid",
+        "/dashboard/payments?payment=already-paid",
         request.url,
       ),
     );
@@ -48,8 +48,7 @@ export async function GET(request: Request) {
   try {
     const transaction = await verifyPaystackTransaction(reference);
 
-    const expectedAmount =
-      PAYMENT_AMOUNTS[payment.type] * 100;
+    const expectedAmount = PAYMENT_AMOUNTS[payment.type] * 100;
 
     const isValidPayment =
       transaction.status === "success" &&
@@ -60,7 +59,7 @@ export async function GET(request: Request) {
     if (!isValidPayment) {
       return NextResponse.redirect(
         new URL(
-          "/dashboard/application?payment=verification-failed",
+          "/dashboard/payments?payment=verification-failed",
           request.url,
         ),
       );
@@ -76,13 +75,12 @@ export async function GET(request: Request) {
         paymentDate: transaction.paid_at
           ? new Date(transaction.paid_at)
           : new Date(),
-        reviewedAt: new Date(),
       },
     });
 
     return NextResponse.redirect(
       new URL(
-        "/dashboard/application?payment=success",
+        "/dashboard/payments?payment=success",
         request.url,
       ),
     );
@@ -91,7 +89,7 @@ export async function GET(request: Request) {
 
     return NextResponse.redirect(
       new URL(
-        "/dashboard/application?payment=verification-error",
+        "/dashboard/payments?payment=verification-error",
         request.url,
       ),
     );
