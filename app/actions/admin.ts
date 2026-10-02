@@ -69,6 +69,7 @@ export async function confirmPayment(
   revalidatePath("/dashboard/admin/applications");
   revalidatePath(`/dashboard/admin/applications/${payment.applicationId}`);
   revalidatePath("/dashboard/application");
+  revalidatePath("/dashboard/payments");
 }
 
 export async function rejectPayment(
@@ -105,6 +106,7 @@ export async function rejectPayment(
   revalidatePath("/dashboard/admin/applications");
   revalidatePath(`/dashboard/admin/applications/${payment.applicationId}`);
   revalidatePath("/dashboard/application");
+  revalidatePath("/dashboard/payments");
 }
 
 export async function getPaymentReceiptUrl(paymentId: string) {
@@ -171,6 +173,7 @@ export async function approveApplication(
   revalidatePath("/dashboard/admin/applications");
   revalidatePath(`/dashboard/admin/applications/${applicationId}`);
   revalidatePath("/dashboard/application");
+  revalidatePath("/dashboard/payments");
 }
 
 export async function rejectApplication(
@@ -206,4 +209,5 @@ export async function rejectApplication(
   revalidatePath("/dashboard/admin/applications");
   revalidatePath(`/dashboard/admin/applications/${applicationId}`);
   revalidatePath("/dashboard/application");
+  revalidatePath("/dashboard/payments");
 }
