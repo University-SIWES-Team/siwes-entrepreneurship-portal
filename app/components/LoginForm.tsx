@@ -10,29 +10,29 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(formData: FormData) {
-  setLoading(true);
-  setError(null);
+    setLoading(true);
+    setError(null);
 
-  const result = await loginStudent(formData);
+    const result = await loginStudent(formData);
 
-  if (result?.error) {
-    setError(result.error);
-    setLoading(false);
-    return;
+    if (result?.error) {
+      setError(result.error);
+      setLoading(false);
+      return;
+    }
+
+    if (result?.role === "ADMIN") {
+      window.location.href = "/dashboard/admin";
+      return;
+    }
+
+    if (result?.role === "TRAINER") {
+      window.location.href = "/dashboard/trainer";
+      return;
+    }
+
+    window.location.href = "/dashboard";
   }
-
-  if (result?.role === "ADMIN") {
-    window.location.href = "/dashboard/admin";
-    return;
-  }
-
-  if (result?.role === "TRAINER") {
-    window.location.href = "/dashboard/trainer";
-    return;
-  }
-
-  window.location.href = "/dashboard";
-}
 
   return (
     <main className="min-h-screen bg-[#F7F9FC] lg:grid lg:grid-cols-[1.1fr_0.9fr]">
@@ -42,7 +42,7 @@ export default function LoginForm() {
             href="/"
             className="text-xl font-bold tracking-tight transition-opacity hover:opacity-80"
           >
-            OUI SIWES Portal
+            Entrepreneurship Portal
           </Link>
 
           <div className="mt-24 max-w-xl">
@@ -55,7 +55,7 @@ export default function LoginForm() {
             </h1>
 
             <p className="mt-6 max-w-lg text-base leading-7 text-white/70">
-              Sign in to continue your SIWES and Entrepreneurship Programme
+              Sign in to continue your Entrepreneurship Programme
               journey and access the information relevant to your current
               stage.
             </p>
@@ -87,7 +87,7 @@ export default function LoginForm() {
         </div>
 
         <p className="text-sm text-white/45">
-          Oduduwa University · SIWES & Entrepreneurship Programme
+          Oduduwa University · Entrepreneurship Programme
         </p>
       </section>
 
@@ -98,7 +98,7 @@ export default function LoginForm() {
               href="/"
               className="text-xl font-bold tracking-tight text-[#0F2747]"
             >
-              OUI SIWES Portal
+              Entrepreneurship Portal
             </Link>
           </div>
 
