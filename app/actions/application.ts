@@ -59,6 +59,7 @@ export async function getApplicationData() {
     include: {
       skill: true,
       payments: true,
+      trainingAssignment: true,
     },
     orderBy: {
       createdAt: "desc",

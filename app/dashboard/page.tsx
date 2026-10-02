@@ -2,57 +2,26 @@ import Link from "next/link";
 import { logout } from "@/app/actions/auth";
 import { getApplicationData } from "@/app/actions/application";
 import LoadingButton from "@/app/components/LoadingButton";
+import { resubmitApplication } from "@/app/actions/student";
 
-const journey = [
-  {
-    number: "01",
-    title: "Account Created",
-    description: "Your portal account has been created.",
-    status: "complete",
-  },
-  {
-    number: "02",
-    title: "Registration",
-    description: "Your student registration details are on record.",
-    status: "complete",
-  },
-  {
-    number: "03",
-    title: "Programme Application",
-    description: "Submit your programme application to continue.",
-    status: "current",
-  },
-  {
-    number: "04",
-    title: "Payment",
-    description: "Complete and verify your programme payment.",
-    status: "upcoming",
-  },
-  {
-    number: "05",
-    title: "Skill Selection",
-    description: "Select an available training skill.",
-    status: "upcoming",
-  },
-  {
-    number: "06",
-    title: "Training",
-    description: "View your training assignment and programme schedule.",
-    status: "upcoming",
-  },
-  {
-    number: "07",
-    title: "Project",
-    description: "Complete and submit your programme project.",
-    status: "upcoming",
-  },
-  {
-    number: "08",
-    title: "Examination & Results",
-    description: "Access examination information and results.",
-    status: "upcoming",
-  },
-];
+// Re-submit form component injected for rejected applications
+function ResubmitForm({ applicationId }: { applicationId: string }) {
+  const resubmit = async () => {
+    "use server";
+    await resubmitApplication(applicationId);
+  };
+
+  return (
+    <form action={resubmit}>
+      <button
+        type="submit"
+        className="block w-full rounded-lg bg-red-500 px-4 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-red-600"
+      >
+        Re-submit Application
+      </button>
+    </form>
+  );
+}
 
 export default async function DashboardPage() {
   const data = await getApplicationData();
@@ -69,6 +38,64 @@ export default async function DashboardPage() {
 
   const totalPayments = application?.payments.length ?? 0;
 
+// 1. STREAMLINED STAGE CALCULATION
+  let currentStepNum = 2; // Default to Application & Skill Selection
+  
+  if (application && application.status !== "REJECTED") {
+    if (totalPayments > 0 && paymentsPaid < totalPayments) {
+      currentStepNum = 3; // Payments phase
+    } else if (paymentsPaid === totalPayments && totalPayments > 0) {
+      if (!application.trainingAssignment) {
+         currentStepNum = 4; // Awaiting Trainer / Training phase
+      } else if (application.trainingAssignment.status !== "COMPLETED") {
+         currentStepNum = 4; // Active Training phase
+      } else {
+         currentStepNum = 5; // Project phase
+      }
+    }
+  }
+
+// 2. REAL-WORLD STREAMLINED PROGRAMME JOURNEY
+  const journey = [
+    { 
+      number: "01", 
+      title: "Account & Registration", 
+      description: "Portal account and student registry records created.", 
+      status: "complete" 
+    },
+    { 
+      number: "02", 
+      title: "Application & Skill Selection", 
+      description: "Submitted your programme application and selected your vocational skill.", 
+      status: application?.status === "APPROVED" ? "complete" : application?.status === "REJECTED" ? "current" : "current" 
+    },
+    { 
+      number: "03", 
+      title: "Programme Payments", 
+      description: "Upload and verify your registration and training fee receipts.", 
+      status: paymentsPaid === totalPayments && totalPayments > 0 ? "complete" : application?.status === "APPROVED" ? "current" : "upcoming" 
+    },
+    { 
+      number: "04", 
+      title: "Training", 
+      description: "Assigned to an expert instructor for practical skill acquisition.", 
+      status: application?.trainingAssignment?.status === "COMPLETED" ? "complete" : application?.trainingAssignment ? "current" : "upcoming" 
+    },
+    { 
+      number: "05", 
+      title: "Final Project", 
+      description: "Complete and submit your vocational training project for review.", 
+      status: "upcoming" 
+    },
+    { 
+      number: "06", 
+      title: "Examination & Results", 
+      description: "Take the entrepreneurship exam and access your final certified results.", 
+      status: "upcoming" 
+    },
+  ];
+
+  // 3. DYNAMIC OVERVIEW CARDS
   const overviewItems = [
     {
       label: "Application",
@@ -91,6 +118,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F9FC] text-[#172033]">
+      {/* Desktop Sidebar */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-[#E2E8F0] bg-white lg:flex lg:flex-col">
         <div className="border-b border-[#E2E8F0] px-6 py-6">
           <Link
@@ -115,9 +143,12 @@ export default async function DashboardPage() {
               Dashboard
             </Link>
 
-            <div className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474]">
+            <Link
+              href="/dashboard/profile"
+              className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]"
+            >
               My Profile
-            </div>
+            </Link>
 
             <Link
               href="/dashboard/application"
@@ -133,11 +164,12 @@ export default async function DashboardPage() {
               Payments
             </Link>
 
+            {/* Inactive links placeholder - will be activated as pages are built */}
             {["Training", "Project", "Examination", "Results"].map(
               (item) => (
                 <div
                   key={item}
-                  className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]"
+                  className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] opacity-60 transition duration-200 cursor-not-allowed"
                 >
                   {item}
                 </div>
@@ -158,6 +190,7 @@ export default async function DashboardPage() {
         </div>
       </aside>
 
+      {/* Header */}
       <header className="sticky top-0 z-20 border-b border-[#E2E8F0] bg-white/95 backdrop-blur lg:ml-64">
         <div className="flex h-16 items-center justify-between px-5 sm:px-8">
           <div>
@@ -185,31 +218,39 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Mobile navigation */}
-        <nav className="flex gap-1 overflow-x-auto border-t border-[#E2E8F0] px-4 py-2 lg:hidden">
+        {/* Mobile Navigation */}
+        <nav className="flex gap-2 overflow-x-auto border-t border-[#E2E8F0] bg-white px-5 py-3 shadow-sm lg:hidden [&::-webkit-scrollbar]:hidden">
           <Link
             href="/dashboard"
-            className="shrink-0 rounded-lg bg-[#F0F5FA] px-3 py-2 text-sm font-semibold text-[#1D5FA7]"
+            className="shrink-0 rounded-lg bg-[#F0F5FA] px-4 py-2 text-sm font-semibold text-[#1D5FA7]"
           >
             Dashboard
           </Link>
 
           <Link
+            href="/dashboard/profile"
+            className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]"
+          >
+            Profile
+          </Link>
+
+          <Link
             href="/dashboard/application"
-            className="shrink-0 rounded-lg px-3 py-2 text-sm text-[#5B6474]"
+            className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]"
           >
             Application
           </Link>
 
           <Link
             href="/dashboard/payments"
-            className="shrink-0 rounded-lg px-3 py-2 text-sm text-[#5B6474]"
+            className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]"
           >
             Payments
           </Link>
         </nav>
       </header>
 
+      {/* Main Content Area */}
       <main className="lg:ml-64">
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
           <section className="border-b border-[#E2E8F0] pb-8">
@@ -235,11 +276,7 @@ export default async function DashboardPage() {
                 </p>
 
                 <p className="mt-1 text-sm font-semibold text-[#172033]">
-                  {!application
-                    ? "Programme Application"
-                    : paymentsPaid < totalPayments
-                      ? "Payment"
-                      : "Training"}
+                  {journey.find((j) => j.status === "current")?.title || "Completed"}
                 </p>
               </div>
             </div>
@@ -320,46 +357,56 @@ export default async function DashboardPage() {
               </div>
             </div>
 
+            {/* Dynamic Next Step Sidebar Block */}
             <aside className="h-fit rounded-lg border border-[#E2E8F0] bg-[#0F2747] p-6 text-white shadow-sm">
               <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#D4A72C]">
                 Next Step
               </p>
 
               <h2 className="mt-3 text-xl font-bold">
-                {!application
-                  ? "Complete your programme application"
-                  : paymentsPaid < totalPayments
-                    ? "Complete your programme payments"
-                    : "Programme application complete"}
+                {currentStepNum === 3 && application?.status === "REJECTED" ? "Update and Re-submit"
+                : currentStepNum === 3 ? "Complete your programme application"
+                : currentStepNum === 4 ? "Complete your programme payments"
+                : currentStepNum === 5 ? "Awaiting Trainer Assignment"
+                : currentStepNum === 6 ? "Begin Vocational Training"
+                : "Proceed to Project Phase"}
               </h2>
 
               <p className="mt-3 text-sm leading-6 text-white/70">
-                {!application
-                  ? "Your next stage is to submit the information required for your programme application."
-                  : paymentsPaid < totalPayments
-                    ? "Complete your outstanding programme payments and submit your payment evidence."
-                    : "Your application and programme payments are complete."}
+                {currentStepNum === 3 && application?.status === "REJECTED" ? "Your application was rejected by the admin. Please review your details and re-submit for approval."
+                : currentStepNum === 3 ? "Your next stage is to submit the information required for your programme application."
+                : currentStepNum === 4 ? "Complete your outstanding programme payments and submit your payment evidence."
+                : currentStepNum === 5 ? "Your application and payments are approved. The Admin will assign your trainer shortly."
+                : currentStepNum === 6 ? "Your trainer has been assigned. You may now begin your vocational syllabus."
+                : "Your training is complete. You may now proceed to the final project and examinations."}
               </p>
 
-              {!application ? (
-                <div className="mt-6">
+              <div className="mt-6">
+                {currentStepNum === 3 && application?.status === "REJECTED" ? (
+                  <ResubmitForm applicationId={application.id} />
+                ) : currentStepNum === 3 ? (
                   <Link
                     href="/dashboard/application"
                     className="block w-full rounded-lg bg-white px-4 py-3 text-center text-sm font-semibold text-[#0F2747] transition hover:-translate-y-0.5 hover:bg-[#F7F9FC]"
                   >
                     Start Application
                   </Link>
-                </div>
-              ) : (
-                <div className="mt-6">
+                ) : currentStepNum === 4 ? (
                   <Link
                     href="/dashboard/payments"
                     className="block w-full rounded-lg bg-[#1D5FA7] px-4 py-3 text-center text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#154b85]"
                   >
                     Make Payments
                   </Link>
-                </div>
-              )}
+                ) : currentStepNum >= 5 ? (
+                  <Link
+                    href="/dashboard/training"
+                    className="block w-full rounded-lg bg-[#1D5FA7] px-4 py-3 text-center text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#154b85]"
+                  >
+                    Go to Training
+                  </Link>
+                ) : null}
+              </div>
             </aside>
           </section>
 
@@ -385,6 +432,7 @@ export default async function DashboardPage() {
         </div>
       </main>
 
+      {/* Mobile Logout block */}
       <div className="border-t border-[#E2E8F0] bg-white p-4 lg:hidden">
         <form action={logout}>
           <LoadingButton
