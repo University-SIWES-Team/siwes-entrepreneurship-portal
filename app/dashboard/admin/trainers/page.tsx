@@ -49,6 +49,7 @@ export default async function AdminTrainersPage() {
 
   const trainers = await prisma.trainer.findMany({
     include: {
+      user: true,
       assignments: {
         include: {
           application: {
@@ -120,7 +121,7 @@ export default async function AdminTrainersPage() {
                     </p>
 
                     <p className="mt-1 text-sm text-[#7A8494]">
-                      {trainer.email}
+                      {trainer.user.email}
                     </p>
                   </div>
 
