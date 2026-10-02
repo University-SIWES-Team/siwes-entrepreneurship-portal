@@ -87,9 +87,12 @@ export default async function TrainerLayout({
 
         <div className="border-t border-[#E2E8F0] p-4">
           <form action={logout}>
-            <LoadingButton loadingText="Signing out..." className="w-full bg-slate-100 text-slate-700 hover:bg-slate-200">
+            <button 
+              type="submit" 
+              className="flex w-full items-center justify-center rounded-lg bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100"
+            >
               Sign out
-            </LoadingButton>
+            </button>
           </form>
         </div>
       </aside>
@@ -136,9 +139,12 @@ export default async function TrainerLayout({
       {/* Mobile Logout */}
       <div className="border-t border-[#E2E8F0] bg-white p-4 lg:hidden">
         <form action={logout}>
-          <LoadingButton loadingText="Signing out..." className="w-full bg-slate-100 text-slate-700 hover:bg-slate-200">
+          <button 
+            type="submit" 
+            className="flex w-full items-center justify-center rounded-lg bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 transition hover:bg-red-100"
+          >
             Sign out
-          </LoadingButton>
+          </button>
         </form>
       </div>
     </div>
