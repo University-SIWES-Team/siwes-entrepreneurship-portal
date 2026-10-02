@@ -4,7 +4,7 @@ export default function Hero() {
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#1D5FA7]">
-            SIWES & Entrepreneurship Programme
+            OUI Entrepreneurship Programme Management System
           </p>
 
           <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight text-[#0F2747] sm:text-5xl lg:text-6xl">
