@@ -193,8 +193,11 @@ export default async function ApplicationDetailsPage({
       orderBy: {
         fullName: "asc",
       },
+      include: {
+        user: true, // We must include the user to access the email!
+      }
     }),
-  ]);
+    ]);
 
   if (!application) {
     notFound();

@@ -7,7 +7,7 @@ import { assignTrainer } from "@/app/actions/training";
 type Trainer = {
   id: string;
   fullName: string;
-  email: string;
+  user: { email: string };
   specialty: string;
 };
 
