@@ -32,7 +32,7 @@ export default function RegisterForm() {
             href="/"
             className="text-xl font-bold tracking-tight transition-opacity hover:opacity-80"
           >
-            OUI SIWES Portal
+            Entrepreneurship Portal
           </Link>
 
           <div className="mt-24 max-w-xl">
@@ -45,9 +45,8 @@ export default function RegisterForm() {
             </h1>
 
             <p className="mt-6 max-w-lg text-base leading-7 text-white/70">
-              Create your student account to access the SIWES and
-              Entrepreneurship Programme portal and manage your journey from
-              registration through completion.
+              Create your student account to access the Entrepreneurship Programme
+              portal and manage your journey from registration through completion.
             </p>
 
             <div className="mt-10 max-w-lg border-t border-white/10 pt-8">
@@ -77,7 +76,7 @@ export default function RegisterForm() {
         </div>
 
         <p className="text-sm text-white/45">
-          Oduduwa University · SIWES & Entrepreneurship Programme
+          Oduduwa University · Entrepreneurship Programme
         </p>
       </section>
 
@@ -88,7 +87,7 @@ export default function RegisterForm() {
               href="/"
               className="text-xl font-bold tracking-tight text-[#0F2747]"
             >
-              OUI SIWES Portal
+              Entrepreneurship Portal
             </Link>
           </div>
 
