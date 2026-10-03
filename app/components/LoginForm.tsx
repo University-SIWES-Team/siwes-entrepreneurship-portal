@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { loginStudent } from "@/app/actions/auth";
 import LoadingButton from "@/app/components/LoadingButton";
+import PasswordInput from "@/app/components/PasswordInput";
 
 export default function LoginForm() {
   const [error, setError] = useState<string | null>(null);
@@ -153,14 +154,21 @@ export default function LoginForm() {
                   Password
                 </label>
 
-                <input
+                <PasswordInput
                   id="password"
                   name="password"
-                  type="password"
                   placeholder="Enter your password"
                   required
-                  className="w-full rounded-lg border border-[#E2E8F0] px-4 py-3.5 text-sm text-[#172033] outline-none transition focus:border-[#1D5FA7] focus:ring-2 focus:ring-[#1D5FA7]/10"
                 />
+              </div>
+
+              <div className="flex items-center justify-end">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm font-semibold text-[#1D5FA7] hover:text-[#0F2747] transition"
+                >
+                  Forgot password?
+                </Link>
               </div>
 
               <LoadingButton

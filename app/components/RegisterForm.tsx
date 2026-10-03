@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { registerStudent } from "@/app/actions/auth";
 import LoadingButton from "@/app/components/LoadingButton";
+import PasswordInput from "@/app/components/PasswordInput";
 
 export default function RegisterForm() {
   const [error, setError] = useState<string | null>(null);
@@ -217,27 +218,43 @@ export default function RegisterForm() {
                     />
                   </div>
 
-                  <div>
-                    <label
-                      htmlFor="password"
-                      className="mb-2 block text-sm font-medium text-[#172033]"
-                    >
-                      Password
-                    </label>
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <div>
+                      <label
+                        htmlFor="password"
+                        className="mb-2 block text-sm font-medium text-[#172033]"
+                      >
+                        Password
+                      </label>
 
-                    <input
-                      id="password"
-                      name="password"
-                      type="password"
-                      placeholder="Create a password"
-                      required
-                      minLength={8}
-                      className="w-full rounded-lg border border-[#E2E8F0] px-4 py-3 text-sm text-[#172033] outline-none transition focus:border-[#1D5FA7] focus:ring-2 focus:ring-[#1D5FA7]/10"
-                    />
+                      <PasswordInput
+                        id="password"
+                        name="password"
+                        placeholder="Create a password"
+                        required
+                        minLength={8}
+                      />
+                      <p className="mt-2 text-xs text-[#7A8494]">
+                        Minimum 8 characters.
+                      </p>
+                    </div>
 
-                    <p className="mt-2 text-xs text-[#7A8494]">
-                      Minimum 8 characters.
-                    </p>
+                    <div>
+                      <label
+                        htmlFor="confirmPassword"
+                        className="mb-2 block text-sm font-medium text-[#172033]"
+                      >
+                        Confirm Password
+                      </label>
+
+                      <PasswordInput
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        placeholder="Type password again"
+                        required
+                        minLength={8}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
