@@ -2,6 +2,7 @@ import { prisma } from "@/app/lib/prisma";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import TrainingStatusForm from "./TrainingStatusForm";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
@@ -79,18 +80,26 @@ export default async function AdminTrainersPage() {
           ← Back to Admin Dashboard
         </a>
 
-        <div className="mt-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#1D5FA7]">
-            Administration
-          </p>
-
-          <h1 className="mt-2 text-3xl font-semibold text-[#0F2747]">
-            Trainers
-          </h1>
-
-          <p className="mt-2 text-[#5B6474]">
-            View trainers, assigned students and training progress.
-          </p>
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#1D5FA7]">
+              Administration
+            </p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-[#0F2747]">
+              Trainers
+            </h1>
+            <p className="mt-2 text-[#5B6474]">
+              View trainers, assigned students and training progress.
+            </p>
+          </div>
+          
+          {/* NEW BUTTON HERE */}
+          <Link
+            href="/dashboard/admin/trainers/new"
+            className="inline-flex shrink-0 items-center justify-center rounded-lg bg-[#1D5FA7] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0F2747]"
+          >
+            + Register New Trainer
+          </Link>
         </div>
 
         <div className="mt-8 space-y-6">

@@ -142,9 +142,11 @@ model Project {
   trainingAssignmentId String             @unique
   trainingAssignment   TrainingAssignment @relation(fields: [trainingAssignmentId], references: [id])
   title                String?
+  description          String?
   submissionUrl        String?
   submittedAt          DateTime?
   reviewed             Boolean            @default(false)
+  feedback             String?
 
   exam Exam?
 }
