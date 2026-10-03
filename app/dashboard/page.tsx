@@ -38,24 +38,26 @@ export default async function DashboardPage() {
 
   const totalPayments = application?.payments.length ?? 0;
 
-// 1. STREAMLINED STAGE CALCULATION
+  // 1. FIXED LOGIC: ACCURATE STAGE CALCULATION
   let currentStepNum = 2; // Default to Application & Skill Selection
   
-  if (application && application.status !== "REJECTED") {
+  if (application && application.status === "APPROVED") {
     if (totalPayments > 0 && paymentsPaid < totalPayments) {
       currentStepNum = 3; // Payments phase
     } else if (paymentsPaid === totalPayments && totalPayments > 0) {
       if (!application.trainingAssignment) {
-         currentStepNum = 4; // Awaiting Trainer / Training phase
+         currentStepNum = 4; // Awaiting Trainer
       } else if (application.trainingAssignment.status !== "COMPLETED") {
          currentStepNum = 4; // Active Training phase
       } else {
          currentStepNum = 5; // Project phase
       }
     }
+  } else if (application?.status === "REJECTED") {
+    currentStepNum = 2; // Force them back to the application stage
   }
 
-// 2. REAL-WORLD STREAMLINED PROGRAMME JOURNEY
+  // 2. REAL-WORLD STREAMLINED PROGRAMME JOURNEY
   const journey = [
     { 
       number: "01", 
@@ -67,7 +69,7 @@ export default async function DashboardPage() {
       number: "02", 
       title: "Application & Skill Selection", 
       description: "Submitted your programme application and selected your vocational skill.", 
-      status: application?.status === "APPROVED" ? "complete" : application?.status === "REJECTED" ? "current" : "current" 
+      status: application?.status === "APPROVED" ? "complete" : "current" 
     },
     { 
       number: "03", 
@@ -79,13 +81,13 @@ export default async function DashboardPage() {
       number: "04", 
       title: "Training", 
       description: "Assigned to an expert instructor for practical skill acquisition.", 
-      status: application?.trainingAssignment?.status === "COMPLETED" ? "complete" : application?.trainingAssignment ? "current" : "upcoming" 
+      status: application?.trainingAssignment?.status === "COMPLETED" ? "complete" : paymentsPaid === totalPayments && totalPayments > 0 ? "current" : "upcoming" 
     },
     { 
       number: "05", 
       title: "Final Project", 
       description: "Complete and submit your vocational training project for review.", 
-      status: "upcoming" 
+      status: application?.trainingAssignment?.status === "COMPLETED" ? "current" : "upcoming" 
     },
     { 
       number: "06", 
@@ -130,7 +132,7 @@ export default async function DashboardPage() {
           <p className="mt-1 text-xs text-[#7A8494]">Student Portal</p>
         </div>
 
-        <nav className="flex-1 px-4 py-6">
+        <nav className="flex-1 px-4 py-6 overflow-y-auto">
           <p className="px-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#7A8494]">
             Portal
           </p>
@@ -143,6 +145,7 @@ export default async function DashboardPage() {
               Dashboard
             </Link>
 
+            {/* ALL LINKS ARE NOW FULLY ACTIVE */}
             <Link
               href="/dashboard/profile"
               className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]"
@@ -164,17 +167,33 @@ export default async function DashboardPage() {
               Payments
             </Link>
 
-            {/* Inactive links placeholder - will be activated as pages are built */}
-            {["Training", "Project", "Examination", "Results"].map(
-              (item) => (
-                <div
-                  key={item}
-                  className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] opacity-60 transition duration-200 cursor-not-allowed"
-                >
-                  {item}
-                </div>
-              ),
-            )}
+            <Link
+              href="/dashboard/training"
+              className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]"
+            >
+              Training
+            </Link>
+
+            <Link
+              href="/dashboard/project"
+              className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]"
+            >
+              Project
+            </Link>
+
+            <Link
+              href="/dashboard/examination"
+              className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]"
+            >
+              Examination
+            </Link>
+
+            <Link
+              href="/dashboard/results"
+              className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]"
+            >
+              Results
+            </Link>
           </div>
         </nav>
 
@@ -220,33 +239,12 @@ export default async function DashboardPage() {
 
         {/* Mobile Navigation */}
         <nav className="flex gap-2 overflow-x-auto border-t border-[#E2E8F0] bg-white px-5 py-3 shadow-sm lg:hidden [&::-webkit-scrollbar]:hidden">
-          <Link
-            href="/dashboard"
-            className="shrink-0 rounded-lg bg-[#F0F5FA] px-4 py-2 text-sm font-semibold text-[#1D5FA7]"
-          >
-            Dashboard
-          </Link>
-
-          <Link
-            href="/dashboard/profile"
-            className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]"
-          >
-            Profile
-          </Link>
-
-          <Link
-            href="/dashboard/application"
-            className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]"
-          >
-            Application
-          </Link>
-
-          <Link
-            href="/dashboard/payments"
-            className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]"
-          >
-            Payments
-          </Link>
+          <Link href="/dashboard" className="shrink-0 rounded-lg bg-[#F0F5FA] px-4 py-2 text-sm font-semibold text-[#1D5FA7]">Dashboard</Link>
+          <Link href="/dashboard/profile" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Profile</Link>
+          <Link href="/dashboard/application" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Application</Link>
+          <Link href="/dashboard/payments" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Payments</Link>
+          <Link href="/dashboard/training" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Training</Link>
+          <Link href="/dashboard/project" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Project</Link>
         </nav>
       </header>
 
@@ -357,58 +355,78 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            {/* Dynamic Next Step Sidebar Block */}
+            {/* FIXED LOGIC: DYNAMIC NEXT STEP BLOCK */}
             <aside className="h-fit rounded-lg border border-[#E2E8F0] bg-[#0F2747] p-6 text-white shadow-sm">
               <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[#D4A72C]">
                 Next Step
               </p>
 
               <h2 className="mt-3 text-xl font-bold">
-                {currentStepNum === 3 && application?.status === "REJECTED" ? "Update and Re-submit"
-                : currentStepNum === 3 ? "Complete your programme application"
-                : currentStepNum === 4 ? "Complete your programme payments"
-                : currentStepNum === 5 ? "Awaiting Trainer Assignment"
-                : currentStepNum === 6 ? "Begin Vocational Training"
+                {application?.status === "REJECTED" ? "Update and Re-submit"
+                : currentStepNum === 2 ? "Complete your programme application"
+                : currentStepNum === 3 ? "Complete your programme payments"
+                : currentStepNum === 4 && !application?.trainingAssignment ? "Awaiting Trainer Assignment"
+                : currentStepNum === 4 ? "Begin Vocational Training"
                 : "Proceed to Project Phase"}
               </h2>
 
               <p className="mt-3 text-sm leading-6 text-white/70">
-                {currentStepNum === 3 && application?.status === "REJECTED" ? "Your application was rejected by the admin. Please review your details and re-submit for approval."
-                : currentStepNum === 3 ? "Your next stage is to submit the information required for your programme application."
-                : currentStepNum === 4 ? "Complete your outstanding programme payments and submit your payment evidence."
-                : currentStepNum === 5 ? "Your application and payments are approved. The Admin will assign your trainer shortly."
-                : currentStepNum === 6 ? "Your trainer has been assigned. You may now begin your vocational syllabus."
+                {application?.status === "REJECTED" ? "Your application was rejected by the admin. Please review your details and re-submit for approval."
+                : currentStepNum === 2 ? "Your next stage is to submit the information required for your programme application."
+                : currentStepNum === 3 ? "Complete your outstanding programme payments and submit your payment evidence."
+                : currentStepNum === 4 && !application?.trainingAssignment ? "Your application and payments are approved. The Admin will assign your trainer shortly."
+                : currentStepNum === 4 ? "Your trainer has been assigned. You may now begin your vocational syllabus."
                 : "Your training is complete. You may now proceed to the final project and examinations."}
               </p>
 
               <div className="mt-6">
-                {currentStepNum === 3 && application?.status === "REJECTED" ? (
+                {application?.status === "REJECTED" ? (
                   <ResubmitForm applicationId={application.id} />
-                ) : currentStepNum === 3 ? (
+                ) : currentStepNum === 2 ? (
                   <Link
                     href="/dashboard/application"
                     className="block w-full rounded-lg bg-white px-4 py-3 text-center text-sm font-semibold text-[#0F2747] transition hover:-translate-y-0.5 hover:bg-[#F7F9FC]"
                   >
                     Start Application
                   </Link>
-                ) : currentStepNum === 4 ? (
+                ) : currentStepNum === 3 ? (
                   <Link
                     href="/dashboard/payments"
                     className="block w-full rounded-lg bg-[#1D5FA7] px-4 py-3 text-center text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#154b85]"
                   >
                     Make Payments
                   </Link>
-                ) : currentStepNum >= 5 ? (
+                ) : currentStepNum === 4 ? (
                   <Link
                     href="/dashboard/training"
                     className="block w-full rounded-lg bg-[#1D5FA7] px-4 py-3 text-center text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#154b85]"
                   >
                     Go to Training
                   </Link>
-                ) : null}
+                ) : (
+                  <Link
+                    href="/dashboard/project"
+                    className="block w-full rounded-lg bg-[#1D5FA7] px-4 py-3 text-center text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#154b85]"
+                  >
+                    Submit Project
+                  </Link>
+                )}
               </div>
             </aside>
           </section>
+
+          {/* SEQUENTIAL NAVIGATION BUTTON */}
+          <div className="mt-12 flex items-center justify-between border-t border-[#E2E8F0] pt-6">
+            <span className="text-sm text-[#7A8494] hidden sm:block">
+              Navigate to your profile to view your personal records.
+            </span>
+            <Link
+              href="/dashboard/profile"
+              className="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-[#0F2747] px-8 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-[#173a6a]"
+            >
+              Next: My Profile &rarr;
+            </Link>
+          </div>
 
           <section className="mt-8 rounded-lg border border-[#E2E8F0] bg-white p-6 shadow-sm">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -419,8 +437,7 @@ export default async function DashboardPage() {
 
                 <p className="mt-1 text-sm leading-6 text-[#5B6474]">
                   Application, payment, training, project, examination, and
-                  result modules will appear here as you progress through the
-                  programme.
+                  result modules are now fully active.
                 </p>
               </div>
 
