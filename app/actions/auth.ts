@@ -8,9 +8,14 @@ import { redirect } from "next/navigation";
 export async function registerStudent(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const confirmPassword = formData.get("confirmPassword") as string;
   const fullName = formData.get("fullName") as string;
   const matricNumber = formData.get("matricNumber") as string;
   const level = Number(formData.get("level"));
+
+  if (password !== confirmPassword) {
+    return { error: "Passwords do not match." };
+  }
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
@@ -18,12 +23,12 @@ export async function registerStudent(formData: FormData) {
   }
 
   const existingStudent = await prisma.student.findUnique({
-  where: { matricNumber },
-});
+    where: { matricNumber },
+  });
 
-if (existingStudent) {
-  return { error: "A student with this matric number already exists." };
-}
+  if (existingStudent) {
+    return { error: "A student with this matric number already exists." };
+  }
 
   const passwordHash = await hashPassword(password);
 

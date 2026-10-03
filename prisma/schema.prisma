@@ -23,6 +23,8 @@ model User {
 
   student Student?
   trainer Trainer?
+  
+  resetTokens PasswordResetToken[]
 }
 
 model Student {
@@ -169,4 +171,15 @@ model Result {
   finalScore  Int
   passed      Boolean
   publishedAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
