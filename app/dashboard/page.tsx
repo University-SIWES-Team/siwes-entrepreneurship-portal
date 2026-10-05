@@ -1,8 +1,13 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
 import { logout } from "@/app/actions/auth";
 import { getApplicationData } from "@/app/actions/application";
-import LoadingButton from "@/app/components/LoadingButton";
 import { resubmitApplication } from "@/app/actions/student";
+import { getActiveSessionForStudent } from "@/app/actions/attendance";
+import LoadingButton from "@/app/components/LoadingButton";
+import StudentAttendanceInput from "@/app/components/student/StudentAttendanceInput";
+import StudentPulseCheck from "@/app/components/student/StudentPulseCheck";
 
 // Re-submit form component injected for rejected applications
 function ResubmitForm({ applicationId }: { applicationId: string }) {
@@ -31,6 +36,21 @@ export default async function DashboardPage() {
   }
 
   const { application } = data;
+
+  // Retrieve user ID for attendance validation
+  const cookieStore = await cookies();
+  const token = cookieStore.get("session")?.value;
+  let userId = "";
+  if (token) {
+    try {
+      const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
+      const { payload } = await jwtVerify(token, JWT_SECRET);
+      userId = payload.userId as string;
+    } catch (e) {}
+  }
+
+  // Fetch active session if user is linked
+  const activeSession = userId ? await getActiveSessionForStudent(userId) : null;
 
   const paymentsPaid =
     application?.payments.filter((payment) => payment.status === "PAID")
@@ -145,7 +165,6 @@ export default async function DashboardPage() {
               Dashboard
             </Link>
 
-            {/* ALL LINKS ARE NOW FULLY ACTIVE */}
             <Link
               href="/dashboard/profile"
               className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]"
@@ -279,6 +298,30 @@ export default async function DashboardPage() {
               </div>
             </div>
           </section>
+
+          {/* ACTIVE CLASS SESSION ALERT */}
+          {activeSession && (
+            <section className="py-6">
+              <div className="overflow-hidden rounded-xl border border-blue-200 bg-blue-50 shadow-sm">
+                <div className="bg-blue-600 px-5 py-3 flex items-center gap-3">
+                  <span className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+                  </span>
+                  <span className="text-sm font-bold tracking-wider text-white uppercase">
+                    Live {activeSession.type} Class in Progress
+                  </span>
+                </div>
+                <div className="p-5 md:p-8 flex justify-center">
+                  {activeSession.type === "PHYSICAL" ? (
+                    <StudentAttendanceInput sessionId={activeSession.id} studentUserId={userId} />
+                  ) : (
+                    <StudentPulseCheck sessionId={activeSession.id} studentUserId={userId} />
+                  )}
+                </div>
+              </div>
+            </section>
+          )}
 
           <section className="py-8">
             <div className="grid gap-4 md:grid-cols-3">
