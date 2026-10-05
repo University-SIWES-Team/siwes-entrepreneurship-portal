@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { logout } from "@/app/actions/auth";
 import LoadingButton from "@/app/components/LoadingButton";
 import { reviewProject } from "@/app/actions/trainer";
+import TrainerSessionManager from "@/app/components/trainer/TrainerSessionManager";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -85,9 +86,14 @@ export default async function TrainerDashboardPage() {
             Student Projects
           </h1>
           <p className="mt-3 text-sm text-[#5B6474] sm:text-base">
-            Review and grade practical projects submitted by your assigned students.
+            Manage live class attendance and review practical projects submitted by your assigned students.
           </p>
         </div>
+
+        {/* Live Attendance Session Manager */}
+        <section className="mt-8">
+          <TrainerSessionManager trainerId={trainer.id} />
+        </section>
 
         <section className="mt-8 grid gap-5 sm:grid-cols-3">
           <div className="rounded-lg border border-[#E2E8F0] bg-white p-6 shadow-sm">
