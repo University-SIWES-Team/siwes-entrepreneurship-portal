@@ -8,6 +8,7 @@ import { getActiveSessionForStudent } from "@/app/actions/attendance";
 import LoadingButton from "@/app/components/LoadingButton";
 import StudentAttendanceInput from "@/app/components/student/StudentAttendanceInput";
 import StudentPulseCheck from "@/app/components/student/StudentPulseCheck";
+import LiveExamBanner from "@/app/components/student/LiveExamBanner";
 
 // Re-submit form component injected for rejected applications
 function ResubmitForm({ applicationId }: { applicationId: string }) {
@@ -270,6 +271,9 @@ export default async function DashboardPage() {
       {/* Main Content Area */}
       <main className="lg:ml-64">
         <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
+
+          <LiveExamBanner/>
+          
           <section className="border-b border-[#E2E8F0] pb-8">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#1D5FA7]">
               Dashboard
