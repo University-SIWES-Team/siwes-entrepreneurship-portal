@@ -28,7 +28,10 @@ export default async function LiveExamBanner() {
       },
     });
 
-    const assignment = user?.student?.applications[0]?.trainingAssignment;
+    // Stops the TS18047 possibly null user error
+    if (!user) return null;
+
+    const assignment = user.student?.applications[0]?.trainingAssignment;
     if (!assignment?.trainerId) return null;
 
     const liveExam = await prisma.exam.findUnique({
@@ -41,7 +44,7 @@ export default async function LiveExamBanner() {
       where: {
         examId_studentUserId: {
           examId: liveExam.id,
-          studentUserId: user.id,
+          studentUserId: user.id, 
         }
       }
     });
