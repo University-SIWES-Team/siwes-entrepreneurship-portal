@@ -89,9 +89,7 @@ export default async function AuditResultPage({
             create: {
               score: newProjectScore,
               reviewed: true,
-              repoUrl: "Admin Override",
-              liveUrl: "Admin Override",
-              status: "PASSED"
+              submissionUrl: "Admin Override",
             }
           }
         }
