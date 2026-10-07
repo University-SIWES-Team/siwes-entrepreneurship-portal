@@ -13,7 +13,7 @@ export async function getTrainerExam(trainerId: string) {
   if (!exam) {
     exam = await prisma.exam.create({
       data: { trainerId },
-      include: { questions: true }, // <-- Fixed this line from [] to true
+      include: { questions: true },
     });
   }
 
@@ -35,6 +35,7 @@ export async function addExamQuestion(params: {
       data: params,
     });
     revalidatePath("/dashboard/trainer");
+    revalidatePath("/dashboard/trainer/exams");
     return { success: true };
   } catch (error) {
     return { error: "Failed to add question." };
@@ -48,24 +49,106 @@ export async function deleteExamQuestion(questionId: string) {
       where: { id: questionId },
     });
     revalidatePath("/dashboard/trainer");
+    revalidatePath("/dashboard/trainer/exams");
     return { success: true };
   } catch (error) {
     return { error: "Failed to delete question." };
   }
 }
 
-// 4. Toggle Exam Live Status
-export async function toggleExamStatus(examId: string, isLive: boolean) {
+// 4. Toggle Exam Live Status with clean payload mapping
+export async function toggleExamStatus(examId: string, isLive: boolean, windowMinutes?: number) {
   try {
+    const updateData: any = {
+      isLive,
+      windowEndsAt: isLive ? new Date(Date.now() + (windowMinutes || 60) * 60000) : null,
+      startedAt: isLive ? new Date() : null,
+    };
+
+    const updatedExam = await prisma.exam.update({
+      where: { id: examId },
+      data: updateData,
+    });
+
+    revalidatePath("/dashboard/trainer");
+    revalidatePath("/dashboard/trainer/exams");
+    return { success: true, exam: updatedExam };
+  } catch (error: any) {
+    console.error("CRITICAL EXAM TOGGLE ERROR:", error);
+    return { error: `Failed to update exam status: ${error.message || "Unknown database error"}` };
+  }
+}
+
+// 5. Initialize or fetch a student's exam attempt with Automatic Window Failsafe Check
+export async function getStudentExamForAttempt(examId: string, studentUserId: string) {
+  const exam = await prisma.exam.findUnique({
+    where: { id: examId },
+    include: { questions: true },
+  });
+
+  if (!exam) {
+    return { error: "Exam not found." };
+  }
+
+  // --- LAZY CHECK FAILSAFE ---
+  if (exam.isLive && exam.windowEndsAt && new Date() > new Date(exam.windowEndsAt)) {
     await prisma.exam.update({
       where: { id: examId },
-      data: { isLive },
+      data: { isLive: false, windowEndsAt: null, startedAt: null },
     });
-    revalidatePath("/dashboard/trainer");
-    return { success: true };
-  } catch (error) {
-    return { error: "Failed to update exam status." };
+    return { error: "This examination window has expired and is now closed." };
   }
+
+  if (!exam.isLive) {
+    return { error: "Exam is not currently live." };
+  }
+
+  let attempt = await prisma.examAttempt.findUnique({
+    where: {
+      examId_studentUserId: {
+        examId,
+        studentUserId,
+      },
+    },
+  });
+
+  let questionIds: string[] = [];
+
+  if (attempt && attempt.shuffledQuestionIds) {
+    questionIds = attempt.shuffledQuestionIds as string[];
+  } else {
+    const allQuestionIds = exam.questions.map((q) => q.id);
+    for (let i = allQuestionIds.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [allQuestionIds[i], allQuestionIds[j]] = [allQuestionIds[j], allQuestionIds[i]];
+    }
+    questionIds = allQuestionIds;
+
+    attempt = await prisma.examAttempt.upsert({
+      where: {
+        examId_studentUserId: { examId, studentUserId },
+      },
+      create: {
+        examId,
+        studentUserId,
+        status: "IN_PROGRESS",
+        shuffledQuestionIds: questionIds,
+      },
+      update: {
+        shuffledQuestionIds: questionIds,
+      },
+    });
+  }
+
+  const orderedQuestions = questionIds
+    .map((id) => exam.questions.find((q) => q.id === id))
+    .filter(Boolean);
+
+  return {
+    exam,
+    attempt,
+    questions: orderedQuestions,
+  };
 }
 
 export async function updateExamDuration(examId: string, durationMins: number) {
@@ -74,6 +157,8 @@ export async function updateExamDuration(examId: string, durationMins: number) {
       where: { id: examId },
       data: { durationMins },
     });
+    revalidatePath("/dashboard/trainer");
+    revalidatePath("/dashboard/trainer/exams");
     return { success: true };
   } catch (error) {
     return { error: "Failed to update duration." };

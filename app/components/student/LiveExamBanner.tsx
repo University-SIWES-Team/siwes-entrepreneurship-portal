@@ -28,7 +28,7 @@ export default async function LiveExamBanner() {
       },
     });
 
-    // FIX: Tell TypeScript to stop immediately if the user doesn't exist
+    // Stops the TS18047 possibly null user error
     if (!user) return null;
 
     const assignment = user.student?.applications[0]?.trainingAssignment;
@@ -44,7 +44,7 @@ export default async function LiveExamBanner() {
       where: {
         examId_studentUserId: {
           examId: liveExam.id,
-          studentUserId: user.id, // TypeScript is now happy because of the check above
+          studentUserId: user.id, 
         }
       }
     });
