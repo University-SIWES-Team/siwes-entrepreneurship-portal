@@ -11,8 +11,14 @@ interface StudentAudit {
   level: number;
 }
 
-export default function TrainerSessionManager({ trainerId }: { trainerId: string }) {
-  const [session, setSession] = useState<{ id: string; type: SessionType } | null>(null);
+export default function TrainerSessionManager({ 
+  trainerId, 
+  initialSession 
+}: { 
+  trainerId: string, 
+  initialSession?: { id: string; type: SessionType } | null 
+}) {
+  const [session, setSession] = useState<{ id: string; type: SessionType } | null>(initialSession || null);
   const [currentCode, setCurrentCode] = useState<string>("");
   const [timeLeft, setTimeLeft] = useState<number>(15);
   const [loading, setLoading] = useState<boolean>(false);
@@ -21,9 +27,21 @@ export default function TrainerSessionManager({ trainerId }: { trainerId: string
     totalPresent: number;
   } | null>(null);
 
+  // Sync state if a new initialSession is passed down from the server (e.g., page refresh)
+  useEffect(() => {
+    if (initialSession) {
+      setSession(initialSession);
+    }
+  }, [initialSession]);
+
   // Rotate code every 15 seconds when a physical session is active
   useEffect(() => {
     if (!session || session.type !== "PHYSICAL") return;
+
+    // Immediately fetch the current code on mount so we don't wait 15 seconds to see it
+    rotateSessionCode(session.id, trainerId).then((res) => {
+      if (res.code) setCurrentCode(res.code);
+    });
 
     const interval = setInterval(async () => {
       setTimeLeft((prev) => {

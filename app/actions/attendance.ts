@@ -99,18 +99,6 @@ export async function submitPhysicalAttendance(params: {
     return { error: "Incorrect code sequence. Try again." };
   }
 
-  // Device Fingerprint check: Ensure no other student in this session used this device
-  const existingDeviceUsage = await prisma.attendance.findFirst({
-    where: {
-      classSessionId: sessionId,
-      deviceFingerprint: fingerprint,
-    },
-  });
-
-  if (existingDeviceUsage) {
-    return { error: "This device has already logged attendance for another student." };
-  }
-
   // Find student's active assignment
   const assignment = await prisma.trainingAssignment.findFirst({
     where: {
@@ -213,19 +201,6 @@ export async function acknowledgeVirtualPulse(params: {
   const session = await prisma.classSession.findUnique({ where: { id: sessionId } });
   if (!session || !session.isActive || session.type !== "VIRTUAL") {
     return { error: "Virtual session is no longer active." };
-  }
-
-  // Ensure no other student in this session used this device
-  const existingDeviceUsage = await prisma.attendance.findFirst({
-    where: {
-      classSessionId: sessionId,
-      deviceFingerprint: fingerprint,
-      assignment: { application: { student: { userId: { not: studentUserId } } } }
-    },
-  });
-
-  if (existingDeviceUsage) {
-    return { error: "This device has already logged attendance for another student." };
   }
 
   const assignment = await prisma.trainingAssignment.findFirst({

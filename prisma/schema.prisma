@@ -206,6 +206,8 @@ model Exam {
   
   title        String         @default("Final Entrepreneurship Examination")
   durationMins Int            @default(45)
+  windowEndsAt DateTime?      
+  startedAt    DateTime?      
   isLive       Boolean        @default(false)
   
   questions    ExamQuestion[]
@@ -231,11 +233,13 @@ model ExamAttempt {
   exam          Exam      @relation(fields: [examId], references: [id], onDelete: Cascade)
   
   studentUserId String    
-  studentUser   User      @relation(fields: [studentUserId], references: [id], onDelete: Cascade) // <-- ADD THIS LINE
+  studentUser   User      @relation(fields: [studentUserId], references: [id], onDelete: Cascade)
   
   status        String    @default("IN_PROGRESS") 
-  tabSwitches   Int       @default(0)              
+  tabSwitches   Int       @default(0)             
   savedAnswers  Json?     
+  
+  shuffledQuestionIds Json? 
   
   score         Int?
   startedAt     DateTime  @default(now())

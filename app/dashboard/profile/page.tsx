@@ -3,8 +3,7 @@ import { prisma } from "@/app/lib/prisma";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { redirect } from "next/navigation";
-import { logout } from "@/app/actions/auth";
-import LoadingButton from "@/app/components/LoadingButton";
+import StudentNavigation from "@/app/components/student/StudentNavigation";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -43,83 +42,27 @@ export default async function StudentProfilePage() {
   const student = await getStudentProfile();
   const application = student.applications?.[0];
 
+  const studentName = student.fullName || "Student Account";
+  const matricNumber = student.matricNumber || "Programme participant";
+  const initials = studentName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase() || "S";
+
   return (
-    <div className="min-h-screen bg-[#F7F9FC] text-[#172033]">
-      {/* Desktop Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-[#E2E8F0] bg-white lg:flex lg:flex-col">
-        <div className="border-b border-[#E2E8F0] px-6 py-6">
-          <Link href="/" className="text-lg font-bold tracking-tight text-[#0F2747]">
-            Entrepreneurship Portal
-          </Link>
-          <p className="mt-1 text-xs text-[#7A8494]">Student Portal</p>
-        </div>
-
-        <nav className="flex-1 px-4 py-6 overflow-y-auto">
-          <p className="px-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#7A8494]">Portal</p>
-          <div className="mt-3 space-y-1">
-            <Link href="/dashboard" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Dashboard
-            </Link>
-            <Link href="/dashboard/profile" className="flex items-center rounded-lg bg-[#F0F5FA] px-3 py-2.5 text-sm font-semibold text-[#1D5FA7]">
-              My Profile
-            </Link>
-            <Link href="/dashboard/application" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Application
-            </Link>
-            <Link href="/dashboard/payments" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Payments
-            </Link>
-            <Link href="/dashboard/training" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Training
-            </Link>
-            <Link href="/dashboard/project" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Project
-            </Link>
-            <Link href="/dashboard/examination" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Examination
-            </Link>
-            <Link href="/dashboard/results" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Results
-            </Link>
-          </div>
-        </nav>
-
-        <div className="border-t border-[#E2E8F0] p-4">
-          <form action={logout}>
-            <LoadingButton loadingText="Signing out..." className="w-full">Sign out</LoadingButton>
-          </form>
-        </div>
-      </aside>
-
-      {/* Header */}
-      <header className="sticky top-0 z-20 border-b border-[#E2E8F0] bg-white/95 backdrop-blur lg:ml-64">
-        <div className="flex h-16 items-center justify-between px-5 sm:px-8">
-          <div>
-            <p className="text-sm font-semibold text-[#0F2747]">Entrepreneurship Portal</p>
-            <p className="hidden text-xs text-[#7A8494] sm:block">Student Dashboard</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold text-[#172033]">Student Account</p>
-              <p className="text-xs text-[#7A8494]">Programme participant</p>
-            </div>
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0F2747] text-sm font-semibold text-white">S</div>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        <nav className="flex gap-2 overflow-x-auto border-t border-[#E2E8F0] bg-white px-5 py-3 shadow-sm lg:hidden [&::-webkit-scrollbar]:hidden">
-          <Link href="/dashboard" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Dashboard</Link>
-          <Link href="/dashboard/profile" className="shrink-0 rounded-lg bg-[#F0F5FA] px-4 py-2 text-sm font-semibold text-[#1D5FA7]">Profile</Link>
-          <Link href="/dashboard/application" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Application</Link>
-          <Link href="/dashboard/payments" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Payments</Link>
-          <Link href="/dashboard/training" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Training</Link>
-          <Link href="/dashboard/project" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Project</Link>
-        </nav>
-      </header>
+    <div className="min-h-screen bg-[#F7F9FC] text-[#172033] flex flex-col lg:flex-row">
+      
+      {/* Universal Dark Sidebar & Mobile Nav Component */}
+      <StudentNavigation 
+        studentName={studentName}
+        matricNumber={matricNumber}
+        initials={initials}
+      />
 
       {/* Main Content Area */}
-      <main className="lg:ml-64">
+      <main className="flex-1 lg:ml-64 w-full">
         <div className="mx-auto max-w-5xl px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
           <section className="border-b border-[#E2E8F0] pb-8">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#1D5FA7]">Student Records</p>
@@ -131,7 +74,7 @@ export default async function StudentProfilePage() {
 
           <section className="mt-8 grid gap-8 lg:grid-cols-2">
             {/* Personal Info Card */}
-            <div className="rounded-lg border border-[#E2E8F0] bg-white shadow-sm overflow-hidden">
+            <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm overflow-hidden">
               <div className="border-b border-[#E2E8F0] bg-[#F7F9FC] px-6 py-4">
                 <h2 className="font-semibold text-[#172033]">Personal Information</h2>
               </div>
@@ -158,7 +101,7 @@ export default async function StudentProfilePage() {
             </div>
 
             {/* Programme Info Card */}
-            <div className="rounded-lg border border-[#E2E8F0] bg-white shadow-sm overflow-hidden">
+            <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm overflow-hidden">
               <div className="border-b border-[#E2E8F0] bg-[#F7F9FC] px-6 py-4">
                 <h2 className="font-semibold text-[#172033]">Programme Status</h2>
               </div>
@@ -204,13 +147,6 @@ export default async function StudentProfilePage() {
           </div>
         </div>
       </main>
-
-      {/* Mobile Logout block */}
-      <div className="border-t border-[#E2E8F0] bg-white p-4 lg:hidden">
-        <form action={logout}>
-          <LoadingButton loadingText="Signing out..." className="w-full">Sign out</LoadingButton>
-        </form>
-      </div>
     </div>
   );
 }

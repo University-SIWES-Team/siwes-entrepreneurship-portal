@@ -120,8 +120,8 @@ export default async function ProjectsGradingPage() {
                                 <textarea name="feedback" rows={2} required placeholder="e.g. Excellent fade technique..." className="mt-2 block w-full rounded-md border border-[#E2E8F0] px-4 py-2 text-sm text-[#172033] focus:border-[#1D5FA7] focus:outline-none"></textarea>
                               </div>
                               <div className="sm:col-span-1">
-                                <label className="block text-xs font-semibold uppercase text-[#7A8494]">Score (/30)</label>
-                                <input type="number" name="score" min="0" max="30" required placeholder="0-30" className="mt-2 block w-full rounded-md border border-[#E2E8F0] px-4 py-2 text-sm text-[#172033] focus:border-[#1D5FA7] focus:outline-none" />
+                                <label className="block text-xs font-semibold uppercase text-[#7A8494]">Score (/60)</label>
+                                <input type="number" name="score" min="0" max="60" required placeholder="0-60" className="mt-2 block w-full rounded-md border border-[#E2E8F0] px-4 py-2 text-sm text-[#172033] focus:border-[#1D5FA7] focus:outline-none" />
                               </div>
                             </div>
 
@@ -141,7 +141,7 @@ export default async function ProjectsGradingPage() {
                                 <p className="font-semibold text-green-800">Project Reviewed</p>
                               </div>
                               <span className="font-bold text-green-900 bg-green-200 px-3 py-1 rounded-full text-sm">
-                                {project.score ?? 0} / 30
+                                {project.score ?? 0} / 60
                               </span>
                             </div>
                             {project.feedback && (
