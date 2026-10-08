@@ -138,7 +138,7 @@ export default function StudentCBTEngine({
     <div className="bg-white rounded-xl shadow-sm border border-[#E2E8F0]">
       {/* Compact Sticky Header with Timer & Anti-Cheat */}
       <div className="sticky top-16 lg:top-0 z-20 bg-white border-b border-[#E2E8F0] p-4 flex flex-wrap items-center justify-between gap-4 rounded-t-xl shadow-sm">
-        <div className="flex-1 min-w-[200px]">
+        <div className="flex-1 min-w-50">
           <h2 className="font-bold text-[#0F2747] truncate">{exam.title}</h2>
           <p className="text-xs font-bold text-[#1D5FA7] mt-0.5">
             Answered: {Object.keys(answers).length} of {exam.questions.length}
