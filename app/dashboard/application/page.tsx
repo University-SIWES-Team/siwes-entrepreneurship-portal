@@ -1,15 +1,15 @@
 import { getApplicationData } from "@/app/actions/application";
 import ApplicationForm from "../../components/ApplicationForm";
 import Link from "next/link";
-import { logout } from "@/app/actions/auth";
-import LoadingButton from "@/app/components/LoadingButton";
+import StudentNavigation from "@/app/components/student/StudentNavigation";
 
 export default async function ApplicationPage() {
   const data = await getApplicationData();
 
+  // FIX 1: Removed StudentNavigation from the error block and centered it.
   if ("error" in data) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-[#F7F9FC] p-6">
+      <main className="flex min-h-screen items-center justify-center bg-[#F7F9FC] p-6">
         <div className="w-full max-w-md rounded-lg border border-[#E2E8F0] bg-white p-8 text-center shadow-sm">
           <h1 className="text-xl font-semibold text-[#0F2747]">
             Application Error
@@ -25,82 +25,23 @@ export default async function ApplicationPage() {
 
   const { student, skills, application } = data;
 
+  // Helper to extract initials for the avatar (e.g., "Ismael Kuda" -> "IK")
+  const initials = student.fullName
+    .split(" ")
+    .map((n: string) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
+
   return (
     <div className="min-h-screen bg-[#F7F9FC] text-[#172033]">
-      {/* Desktop Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-[#E2E8F0] bg-white lg:flex lg:flex-col">
-        <div className="border-b border-[#E2E8F0] px-6 py-6">
-          <Link href="/" className="text-lg font-bold tracking-tight text-[#0F2747]">
-            Entrepreneurship Portal
-          </Link>
-          <p className="mt-1 text-xs text-[#7A8494]">Student Portal</p>
-        </div>
-
-        <nav className="flex-1 px-4 py-6 overflow-y-auto">
-          <p className="px-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#7A8494]">Portal</p>
-          <div className="mt-3 space-y-1">
-            <Link href="/dashboard" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Dashboard
-            </Link>
-            <Link href="/dashboard/profile" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              My Profile
-            </Link>
-            <Link href="/dashboard/application" className="flex items-center rounded-lg bg-[#F0F5FA] px-3 py-2.5 text-sm font-semibold text-[#1D5FA7]">
-              Application
-            </Link>
-            <Link href="/dashboard/payments" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Payments
-            </Link>
-            <Link href="/dashboard/training" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Training
-            </Link>
-            <Link href="/dashboard/project" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Project
-            </Link>
-            <Link href="/dashboard/examination" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Examination
-            </Link>
-            <Link href="/dashboard/results" className="flex items-center rounded-lg px-3 py-2.5 text-sm text-[#5B6474] transition duration-200 hover:bg-[#F7F9FC] hover:text-[#172033]">
-              Results
-            </Link>
-          </div>
-        </nav>
-
-        <div className="border-t border-[#E2E8F0] p-4">
-          <form action={logout}>
-            <LoadingButton loadingText="Signing out..." className="w-full">Sign out</LoadingButton>
-          </form>
-        </div>
-      </aside>
-
-      {/* Header */}
-      <header className="sticky top-0 z-20 border-b border-[#E2E8F0] bg-white/95 backdrop-blur lg:ml-64">
-        <div className="flex h-16 items-center justify-between px-5 sm:px-8">
-          <div>
-            <p className="text-sm font-semibold text-[#0F2747]">Entrepreneurship Portal</p>
-            <p className="hidden text-xs text-[#7A8494] sm:block">Student Dashboard</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-semibold text-[#172033]">Student Account</p>
-              <p className="text-xs text-[#7A8494]">Programme participant</p>
-            </div>
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0F2747] text-sm font-semibold text-white">S</div>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        <nav className="flex gap-2 overflow-x-auto border-t border-[#E2E8F0] bg-white px-5 py-3 shadow-sm lg:hidden [&::-webkit-scrollbar]:hidden">
-          <Link href="/dashboard" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Dashboard</Link>
-          <Link href="/dashboard/profile" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Profile</Link>
-          <Link href="/dashboard/application" className="shrink-0 rounded-lg bg-[#F0F5FA] px-4 py-2 text-sm font-semibold text-[#1D5FA7]">Application</Link>
-          <Link href="/dashboard/payments" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Payments</Link>
-          <Link href="/dashboard/training" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Training</Link>
-          <Link href="/dashboard/project" className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-[#5B6474] transition hover:bg-[#F7F9FC]">Project</Link>
-        </nav>
-      </header>
-
-      {/* Main Content Area */}
+      {/* FIX 2: Passed the exact props TypeScript is asking for */}
+      <StudentNavigation 
+        studentName={student.fullName}
+        matricNumber={student.matricNumber}
+        initials={initials}
+      />
+      
       <main className="lg:ml-64">
         <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
           <section className="border-b border-[#E2E8F0] pb-8">
@@ -136,7 +77,7 @@ export default async function ApplicationPage() {
                   <div>
                     <p className="text-xs font-medium uppercase tracking-wider text-[#7A8494]">Payment progress</p>
                     <p className="mt-1 font-medium text-[#172033]">
-                      {application.payments.filter((p) => p.status === "PAID").length}
+                      {application.payments.filter((p: any) => p.status === "PAID").length}
                       /{application.payments.length} payments verified
                     </p>
                   </div>
@@ -203,13 +144,6 @@ export default async function ApplicationPage() {
           </div>
         </div>
       </main>
-
-      {/* Mobile Logout block */}
-      <div className="border-t border-[#E2E8F0] bg-white p-4 lg:hidden">
-        <form action={logout}>
-          <LoadingButton loadingText="Signing out..." className="w-full">Sign out</LoadingButton>
-        </form>
-      </div>
     </div>
   );
 }
