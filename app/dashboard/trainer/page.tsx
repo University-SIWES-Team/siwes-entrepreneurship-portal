@@ -14,35 +14,39 @@ async function getTrainerData() {
   const token = cookieStore.get("session")?.value;
   if (!token) redirect("/login");
 
+  let payload;
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    if (!payload.userId) redirect("/login");
-
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId as string },
-      include: {
-        trainer: {
-          include: {
-            assignments: {
-              include: { project: true },
-            },
-            exam: true, // Include the master exam to check live status & banner details
-          },
-        },
-      },
-    });
-
-    if (!user || user.role !== "TRAINER" || !user.trainer) redirect("/dashboard");
-    return user.trainer;
+    const verified = await jwtVerify(token, JWT_SECRET);
+    payload = verified.payload;
   } catch {
     redirect("/login");
   }
+
+  if (!payload?.userId) redirect("/login");
+
+  const user = await prisma.user.findUnique({
+    where: { id: payload.userId as string },
+    include: {
+      trainer: {
+        include: {
+          assignments: {
+            include: { project: true },
+          },
+        },
+      },
+    },
+  });
+
+  if (!user) throw new Error("DEBUG (Page): User account does not exist.");
+  if (user.role !== "TRAINER") throw new Error("DEBUG (Page): Role is not TRAINER.");
+  if (!user.trainer) throw new Error("DEBUG (Page): Trainer profile is missing!");
+
+  return user.trainer;
 }
 
 export default async function TrainerOverviewPage() {
   const trainer = await getTrainerData();
-  const exam = trainer.exam;
-
+  
   const activeSession = await prisma.classSession.findFirst({
     where: {
       trainerId: trainer.id,
@@ -54,12 +58,20 @@ export default async function TrainerOverviewPage() {
     }
   });
 
-  const pendingReviews = trainer.assignments.filter((a) => a.project && !a.project.reviewed).length;
-  const completedReviews = trainer.assignments.filter((a) => a.project?.reviewed).length;
+  const exam = await prisma.exam.findFirst({
+    where: { 
+      trainerId: trainer.id, 
+      isLive: true 
+    }
+  });
+
+  const assignments = trainer.assignments || [];
+  const totalAssignedStudents = assignments.length;
+  const pendingReviews = assignments.filter((a: any) => a.project && !a.project.reviewed).length;
+  const completedReviews = assignments.filter((a: any) => a.project?.reviewed).length;
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:py-10 space-y-8">
-      {/* --- ACTIVE EXAM ALERT BANNER --- */}
       {exam?.isLive && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center gap-3">
@@ -109,7 +121,7 @@ export default async function TrainerOverviewPage() {
       <section className="grid gap-5 sm:grid-cols-3">
         <div className="rounded-lg border border-[#E2E8F0] bg-white p-6 shadow-sm">
           <p className="text-sm font-medium text-[#7A8494]">Total Assigned Students</p>
-          <p className="mt-2 text-3xl font-bold text-[#0F2747]">{trainer.assignments.length}</p>
+          <p className="mt-2 text-3xl font-bold text-[#0F2747]">{totalAssignedStudents}</p>
         </div>
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 shadow-sm">
           <p className="text-sm font-medium text-amber-800">Pending Project Reviews</p>
