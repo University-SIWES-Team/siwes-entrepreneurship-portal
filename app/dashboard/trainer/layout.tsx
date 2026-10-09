@@ -12,23 +12,32 @@ async function verifyTrainer() {
 
   if (!token) redirect("/login");
 
+  let payload;
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    if (!payload.userId) redirect("/login");
-
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId as string },
-      include: { trainer: true },
-    });
-
-    if (!user || user.role !== "TRAINER" || !user.trainer) {
-      redirect("/dashboard");
-    }
-    
-    return user;
+    const verified = await jwtVerify(token, JWT_SECRET);
+    payload = verified.payload;
   } catch {
     redirect("/login");
   }
+
+  if (!payload?.userId) redirect("/login");
+
+  const user = await prisma.user.findUnique({
+    where: { id: payload.userId as string },
+    include: { trainer: true },
+  });
+
+  if (!user) {
+    throw new Error("DEBUG: User account does not exist.");
+  }
+  if (user.role !== "TRAINER") {
+    throw new Error(`DEBUG: Role is not TRAINER. It is: ${user.role}`);
+  }
+  if (!user.trainer) {
+    throw new Error("DEBUG: Trainer profile is missing! The user exists but has no linked Trainer data.");
+  }
+  
+  return user;
 }
 
 export default async function TrainerLayout({
